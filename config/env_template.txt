@@ -1,0 +1,20 @@
+# Ultrahuman API Configuration Template
+# 
+# Set these as environment variables before running the script:
+#
+# On Mac/Linux:
+#   export ULTRAHUMAN_API_TOKEN='your_jwt_token_here'
+#   export ULTRAHUMAN_EMAIL='your_email@example.com'
+#
+# On Windows:
+#   set ULTRAHUMAN_API_TOKEN=your_jwt_token_here
+#   set ULTRAHUMAN_EMAIL=your_email@example.com
+#
+# Or add to your shell profile (~/.zshrc, ~/.bashrc) for persistence.
+#
+# Token Details (for reference):
+#   - Token Name: ultrahuman_01
+#   - Scopes: ring
+#   - Expires: 2026-12-06
+#   - Access Code: PETWOXPR (may be needed for certain operations)
+

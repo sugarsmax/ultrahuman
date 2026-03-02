@@ -1,0 +1,62 @@
+name: Nightly Dashboard Update
+
+on:
+  schedule:
+    # 08:00 UTC = midnight Pacific (PST, UTC-8) / 1 AM PDT
+    - cron: "0 8 * * *"
+  workflow_dispatch:  # allow manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch last 7 days of metrics
+        env:
+          ULTRAHUMAN_API_TOKEN: ${{ secrets.ULTRAHUMAN_API_TOKEN }}
+          ULTRAHUMAN_EMAIL: ${{ secrets.ULTRAHUMAN_EMAIL }}
+        run: |
+          python scripts/ultrahuman_query_20251209.py \
+            --start-date "$(date -d '7 days ago' +%Y-%m-%d)" \
+            --end-date "$(date -d 'yesterday' +%Y-%m-%d)" \
+            --output data/last_7_days.json \
+            --limit 10
+
+      - name: Generate charts
+        run: python scripts/hr_charts_20251209.py --input data/last_7_days.json
+
+      - name: Build dashboard HTML
+        run: python scripts/build_page_20260302.py --data data/last_7_days.json
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
