@@ -40,6 +40,7 @@ jobs:
           ULTRAHUMAN_API_TOKEN: ${{ secrets.ULTRAHUMAN_API_TOKEN }}
           ULTRAHUMAN_EMAIL: ${{ secrets.ULTRAHUMAN_EMAIL }}
         run: |
+          mkdir -p data
           python scripts/ultrahuman_query_20251209.py \
             --start-date "$(date -d '7 days ago' +%Y-%m-%d)" \
             --end-date "$(date -d 'yesterday' +%Y-%m-%d)" \
