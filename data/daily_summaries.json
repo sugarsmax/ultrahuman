@@ -1,0 +1,64 @@
+{
+  "2026-02-23": {
+    "hr_avg": 58.8,
+    "hr_min": 53,
+    "hr_max": 68,
+    "hr_readings": 70,
+    "sleep_rhr": 51,
+    "hrv": 29,
+    "sleep_hrs": 7.17
+  },
+  "2026-02-24": {
+    "hr_avg": 60.6,
+    "hr_min": 54,
+    "hr_max": 72,
+    "hr_readings": 16,
+    "sleep_rhr": 51,
+    "hrv": 50
+  },
+  "2026-02-25": {
+    "hr_avg": 59.5,
+    "hr_min": 51,
+    "hr_max": 91,
+    "hr_readings": 90,
+    "sleep_rhr": 52,
+    "hrv": 38,
+    "sleep_hrs": 7.83
+  },
+  "2026-02-26": {
+    "hr_avg": 57.2,
+    "hr_min": 47,
+    "hr_max": 85,
+    "hr_readings": 91,
+    "sleep_rhr": 51,
+    "hrv": 30,
+    "sleep_hrs": 7.25
+  },
+  "2026-02-27": {
+    "hr_avg": 61.5,
+    "hr_min": 39,
+    "hr_max": 113,
+    "hr_readings": 153,
+    "sleep_rhr": 54,
+    "hrv": 35,
+    "sleep_hrs": 7.0
+  },
+  "2026-02-28": {
+    "hr_avg": 66.3,
+    "hr_min": 51,
+    "hr_max": 143,
+    "hr_readings": 125,
+    "sleep_rhr": 51,
+    "hrv": 35,
+    "sleep_hrs": 8.17
+  },
+  "2026-03-01": {
+    "hr_avg": 62.0,
+    "hr_min": 41,
+    "hr_max": 123,
+    "hr_readings": 105,
+    "sleep_rhr": 51,
+    "hrv": 33,
+    "sleep_hrs": 8.08
+  }
+}
