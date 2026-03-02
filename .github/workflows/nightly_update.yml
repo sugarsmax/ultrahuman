@@ -7,7 +7,7 @@ on:
   workflow_dispatch:  # allow manual trigger
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -49,6 +49,17 @@ jobs:
 
       - name: Generate charts
         run: python scripts/hr_charts_20251209.py --input data/last_7_days.json
+
+      - name: Extract and merge daily summaries
+        run: python scripts/extract_daily_summaries_20260302.py --input data/last_7_days.json
+
+      - name: Commit daily summaries
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/daily_summaries.json
+          git diff --cached --quiet || git commit -m "chore: update daily summaries $(date +%Y-%m-%d)"
+          git push
 
       - name: Build dashboard HTML
         run: python scripts/build_page_20260302.py --data data/last_7_days.json

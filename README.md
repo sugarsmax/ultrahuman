@@ -4,21 +4,28 @@
 
 Scripts for querying and visualizing personal health data from the Ultrahuman Vision API. A GitHub Pages dashboard is updated nightly via GitHub Actions.
 
+https://sugarsmax.github.io/ultrahuman/
+
 ## Project Structure
 
 ```
 ultrahuman/
   .github/workflows/
-    nightly_update.yml             # Nightly CI: fetch, chart, deploy
+    nightly_update.yml                    # Nightly CI: fetch, chart, deploy
   scripts/
-    ultrahuman_query_20251209.py   # API query script
-    hr_charts_20251209.py          # Heart rate visualization script
-    build_page_20260302.py         # HTML dashboard generator
+    ultrahuman_query_20251209.py          # API query script
+    hr_charts_20251209.py                 # Heart rate visualization script
+    extract_daily_summaries_20260302.py   # Daily summary extractor + merger
+    build_page_20260302.py                # HTML dashboard generator (weekly + monthly)
   config/
-    env_template.txt               # Environment variable reference
-  data/                            # Query output (gitignored)
-  output/                          # Chart images (auto-created)
-  _site/                           # Generated dashboard (gitignored, built by CI)
+    env_template.txt                      # Environment variable reference
+  data/
+    daily_summaries.json                  # Long-term archive, git-committed
+    last_7_days.json                      # Ephemeral API response (gitignored)
+  output/                                 # Chart images (auto-created)
+  _site/                                  # Generated dashboard (gitignored, built by CI)
+    index.html                            # Weekly view (base64 charts)
+    monthly.html                          # Monthly view (Chart.js + inline JSON)
   requirements.txt
   .gitignore
 ```
@@ -115,21 +122,44 @@ python scripts/hr_charts_20251209.py --test
 - **Auth Header**: `Authorization: YOUR_TOKEN` (no Bearer prefix)
 - **Docs**: <a href="https://vision.ultrahuman.com/developer/docs" target="_blank">Ultrahuman Vision Developer Docs</a>
 
+## Data Architecture
+
+### Two-tier storage
+
+| File | Purpose | Git status |
+|------|---------|------------|
+| `data/last_7_days.json` | Raw API response for dense HR charts | gitignored, ephemeral |
+| `data/daily_summaries.json` | One record per day, long-term archive (up to 3 years) | **committed** |
+
+The `daily_summaries.json` file is append-only. Each nightly run extracts per-day aggregates (avg/min/max HR, sleep RHR, HRV, recovery, sleep hours) from the 7-day fetch and merges them in. Duplicate dates are overwritten with the latest data.
+
+### Extract daily summaries manually
+
+```bash
+python scripts/extract_daily_summaries_20260302.py --input data/last_7_days.json
+python scripts/extract_daily_summaries_20260302.py --test  # dry run
+```
+
 ## Data Log
 
-Historical metrics are tracked in a <a href="https://docs.google.com/spreadsheets/d/1jbRvJd_4-dtYEwhZU8C__b02Qe5WNgMq692JyxvwF8E/edit?gid=0#gid=0" target="_blank">Google Sheets spreadsheet</a>.
+Historical metrics are also tracked in a <a href="https://docs.google.com/spreadsheets/d/1jbRvJd_4-dtYEwhZU8C__b02Qe5WNgMq692JyxvwF8E/edit?gid=0#gid=0" target="_blank">Google Sheets spreadsheet</a>.
 
 ## GitHub Pages Dashboard
 
-A self-contained HTML dashboard is built nightly and deployed to GitHub Pages. It embeds the latest charts as base64 images so there are no external asset dependencies.
+Two pages are built nightly and deployed to GitHub Pages:
+
+- **Weekly** (`index.html`) -- 7-day view with embedded matplotlib chart PNGs
+- **Monthly** (`monthly.html`) -- month-selectable view with Chart.js trend lines, reading from the long-term `daily_summaries.json` archive
 
 ### Automatic (nightly)
 
 The GitHub Actions workflow runs at midnight Pacific every night:
 1. Fetches the last 7 days of metrics from the Ultrahuman API
 2. Generates dense and weekly HR chart PNGs
-3. Builds `_site/index.html` with embedded charts and summary stats
-4. Deploys to GitHub Pages
+3. Extracts daily summaries and merges into `data/daily_summaries.json`
+4. Commits the updated summaries file back to the repo
+5. Builds `_site/index.html` and `_site/monthly.html`
+6. Deploys to GitHub Pages
 
 You can also trigger a manual run from the **Actions** tab.
 
@@ -148,8 +178,10 @@ You can also trigger a manual run from the **Actions** tab.
 source ~/.python-venvs/pdms-shared/bin/activate
 python scripts/ultrahuman_query_20251209.py --start-date 2026-02-23 --end-date 2026-03-01 --output data/last_7_days.json
 python scripts/hr_charts_20251209.py --input data/last_7_days.json
+python scripts/extract_daily_summaries_20260302.py --input data/last_7_days.json
 python scripts/build_page_20260302.py
 open _site/index.html
+open _site/monthly.html
 ```
 
 ## Data Available

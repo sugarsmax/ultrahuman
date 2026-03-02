@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Build a self-contained HTML dashboard from Ultrahuman chart images and JSON data.
+Build self-contained HTML dashboards from Ultrahuman data.
 
-Embeds chart PNGs as base64 so the page works with no external dependencies.
-Designed for GitHub Pages deployment via Actions.
+Produces two pages:
+  _site/index.html   -- 7-day view with embedded chart PNGs (existing)
+  _site/monthly.html  -- month-selectable view using Chart.js + inline JSON
 
 Usage:
     python build_page_20260302.py
@@ -23,6 +24,7 @@ PROJECT_DIR = SCRIPT_DIR.parent
 DATA_DIR = PROJECT_DIR / "data"
 OUTPUT_DIR = PROJECT_DIR / "output"
 SITE_DIR = PROJECT_DIR / "_site"
+SUMMARIES_FILE = DATA_DIR / "daily_summaries.json"
 
 LOCAL_TZ = ZoneInfo("America/Los_Angeles")
 
@@ -124,8 +126,147 @@ def build_stat_card(label: str, value: str, unit: str = "") -> str:
 </div>"""
 
 
+NAV_CSS = """
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  nav a {
+    color: #8b949e;
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid #30363d;
+    transition: all 0.15s;
+  }
+  nav a:hover { color: #f0f6fc; border-color: #58a6ff; }
+  nav a.active { color: #f0f6fc; background: #161b22; border-color: #58a6ff; }
+"""
+
+SHARED_CSS = """
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 0.8rem;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #f0f6fc;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  header .subtitle {
+    color: #8b949e;
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 1.2rem 1rem;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f0f6fc;
+  }
+  .stat-unit {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #8b949e;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: #8b949e;
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .chart-section {
+    margin-bottom: 2rem;
+  }
+  .chart-section h2 {
+    font-size: 1.1rem;
+    color: #f0f6fc;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+  }
+  .chart-section img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+  }
+  .no-data {
+    color: #8b949e;
+    font-style: italic;
+    padding: 2rem;
+    text-align: center;
+    background: #161b22;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #21262d;
+    color: #484f58;
+    font-size: 0.8rem;
+  }
+  footer a {
+    color: #58a6ff;
+    text-decoration: none;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
+"""
+
+
+def build_nav(active: str) -> str:
+    """Return nav HTML with the active page highlighted."""
+    links = [
+        ("index.html", "Weekly"),
+        ("monthly.html", "Monthly"),
+    ]
+    parts = []
+    for href, label in links:
+        cls = ' class="active"' if href == active else ""
+        parts.append(f'<a href="{href}"{cls}>{label}</a>')
+    return f'<nav>{"".join(parts)}</nav>'
+
+
 def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, updated: str) -> str:
-    """Assemble the full HTML page."""
+    """Assemble the weekly (index) HTML page."""
 
     cards = []
     if "hr_avg" in summary:
@@ -153,6 +294,8 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
         else '<p class="no-data">Weekly chart not available</p>'
     )
 
+    nav = build_nav("index.html")
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -160,107 +303,8 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ultrahuman Dashboard</title>
 <style>
-  *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
-
-  body {{
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #0d1117;
-    color: #c9d1d9;
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }}
-
-  .container {{
-    max-width: 960px;
-    margin: 0 auto;
-  }}
-
-  header {{
-    text-align: center;
-    margin-bottom: 2rem;
-  }}
-  header h1 {{
-    font-size: 1.8rem;
-    color: #f0f6fc;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }}
-  header .subtitle {{
-    color: #8b949e;
-    font-size: 0.95rem;
-    margin-top: 0.3rem;
-  }}
-
-  .stats-grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2.5rem;
-  }}
-  .stat-card {{
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-    padding: 1.2rem 1rem;
-    text-align: center;
-  }}
-  .stat-value {{
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #f0f6fc;
-  }}
-  .stat-unit {{
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: #8b949e;
-  }}
-  .stat-label {{
-    font-size: 0.8rem;
-    color: #8b949e;
-    margin-top: 0.3rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }}
-
-  .chart-section {{
-    margin-bottom: 2rem;
-  }}
-  .chart-section h2 {{
-    font-size: 1.1rem;
-    color: #f0f6fc;
-    margin-bottom: 0.8rem;
-    font-weight: 600;
-  }}
-  .chart-section img {{
-    width: 100%;
-    border-radius: 10px;
-    border: 1px solid #30363d;
-  }}
-  .no-data {{
-    color: #8b949e;
-    font-style: italic;
-    padding: 2rem;
-    text-align: center;
-    background: #161b22;
-    border-radius: 10px;
-    border: 1px solid #30363d;
-  }}
-
-  footer {{
-    text-align: center;
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #21262d;
-    color: #484f58;
-    font-size: 0.8rem;
-  }}
-  footer a {{
-    color: #58a6ff;
-    text-decoration: none;
-  }}
-  footer a:hover {{
-    text-decoration: underline;
-  }}
+{SHARED_CSS}
+{NAV_CSS}
 </style>
 </head>
 <body>
@@ -269,6 +313,8 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
     <h1>Ultrahuman Dashboard</h1>
     <div class="subtitle">{summary.get("date_range", "")}</div>
   </header>
+
+  {nav}
 
   <div class="stats-grid">
     {cards_html}
@@ -294,6 +340,317 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
 """
 
 
+# ---------------------------------------------------------------------------
+# Monthly page
+# ---------------------------------------------------------------------------
+
+def load_daily_summaries() -> dict:
+    """Load the historical daily_summaries.json, or return empty dict."""
+    if SUMMARIES_FILE.exists():
+        with open(SUMMARIES_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def build_monthly_html(summaries_json: str, updated: str) -> str:
+    """Assemble the monthly HTML page with inline Chart.js."""
+
+    nav = build_nav("monthly.html")
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ultrahuman - Monthly View</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+{SHARED_CSS}
+{NAV_CSS}
+
+  .month-picker {{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }}
+  .month-picker button {{
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.15s;
+  }}
+  .month-picker button:hover {{ border-color: #58a6ff; color: #f0f6fc; }}
+  .month-picker button:disabled {{ opacity: 0.3; cursor: default; border-color: #30363d; }}
+  .month-picker span {{
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f0f6fc;
+    min-width: 160px;
+    text-align: center;
+  }}
+
+  .chart-box {{
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+  }}
+  .chart-box h2 {{
+    font-size: 1rem;
+    color: #f0f6fc;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+  }}
+  .chart-box canvas {{
+    width: 100% !important;
+  }}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Ultrahuman Dashboard</h1>
+    <div class="subtitle">Monthly Activity</div>
+  </header>
+
+  {nav}
+
+  <div class="month-picker">
+    <button id="prevMonth">&larr;</button>
+    <span id="monthLabel"></span>
+    <button id="nextMonth">&rarr;</button>
+  </div>
+
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="chart-box">
+    <h2>Heart Rate</h2>
+    <canvas id="hrChart" height="200"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>HRV</h2>
+    <canvas id="hrvChart" height="160"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Recovery Score</h2>
+    <canvas id="recoveryChart" height="160"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Sleep Duration</h2>
+    <canvas id="sleepChart" height="160"></canvas>
+  </div>
+
+  <footer>
+    Updated {updated} &middot;
+    Data from <a href="https://vision.ultrahuman.com" target="_blank">Ultrahuman Vision</a>
+  </footer>
+</div>
+
+<script>
+const ALL_DATA = {summaries_json};
+
+const MONTHS = Object.keys(ALL_DATA)
+  .map(d => d.slice(0, 7))
+  .filter((v, i, a) => a.indexOf(v) === i)
+  .sort();
+
+let currentIdx = MONTHS.length - 1;
+
+const chartDefaults = {{
+  responsive: true,
+  animation: false,
+  plugins: {{
+    legend: {{ display: false }},
+    tooltip: {{
+      backgroundColor: '#161b22',
+      borderColor: '#30363d',
+      borderWidth: 1,
+      titleColor: '#f0f6fc',
+      bodyColor: '#c9d1d9',
+    }}
+  }},
+  scales: {{
+    x: {{
+      ticks: {{ color: '#8b949e', maxRotation: 0 }},
+      grid: {{ color: 'rgba(255,255,255,0.06)' }}
+    }},
+    y: {{
+      ticks: {{ color: '#8b949e' }},
+      grid: {{ color: 'rgba(255,255,255,0.06)' }}
+    }}
+  }}
+}};
+
+function makeChart(canvasId, label, color, fillColor) {{
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  return new Chart(ctx, {{
+    type: 'line',
+    data: {{
+      labels: [],
+      datasets: [{{
+        label: label,
+        data: [],
+        borderColor: color,
+        backgroundColor: fillColor || 'transparent',
+        fill: !!fillColor,
+        tension: 0.3,
+        pointRadius: 3,
+        pointBackgroundColor: color,
+        borderWidth: 2,
+      }}]
+    }},
+    options: structuredClone(chartDefaults)
+  }});
+}}
+
+const hrChart = makeChart('hrChart', 'Avg HR', '#ff6b6b', 'rgba(255,107,107,0.15)');
+const hrvChart = makeChart('hrvChart', 'HRV', '#4ecdc4', 'rgba(78,205,196,0.15)');
+const recoveryChart = makeChart('recoveryChart', 'Recovery', '#87bc40', 'rgba(135,188,64,0.15)');
+const sleepChart = makeChart('sleepChart', 'Sleep (hrs)', '#9b59b6', 'rgba(155,89,182,0.15)');
+
+function makeStatCard(label, value, unit) {{
+  return '<div class="stat-card">'
+    + '<div class="stat-value">' + value + '<span class="stat-unit">' + (unit || '') + '</span></div>'
+    + '<div class="stat-label">' + label + '</div></div>';
+}}
+
+function updateView() {{
+  const month = MONTHS[currentIdx];
+  const [y, m] = month.split('-');
+  const monthName = new Date(parseInt(y), parseInt(m) - 1, 1)
+    .toLocaleString('en-US', {{ month: 'long', year: 'numeric' }});
+  document.getElementById('monthLabel').textContent = monthName;
+  document.getElementById('prevMonth').disabled = (currentIdx === 0);
+  document.getElementById('nextMonth').disabled = (currentIdx === MONTHS.length - 1);
+
+  const days = Object.keys(ALL_DATA)
+    .filter(d => d.startsWith(month))
+    .sort();
+
+  const labels = days.map(d => parseInt(d.split('-')[2]));
+  const hrAvg = days.map(d => ALL_DATA[d].hr_avg ?? null);
+  const hrMin = days.map(d => ALL_DATA[d].hr_min ?? null);
+  const hrMax = days.map(d => ALL_DATA[d].hr_max ?? null);
+  const sleepRhr = days.map(d => ALL_DATA[d].sleep_rhr ?? null);
+  const hrv = days.map(d => ALL_DATA[d].hrv ?? null);
+  const recovery = days.map(d => ALL_DATA[d].recovery ?? null);
+  const sleep = days.map(d => ALL_DATA[d].sleep_hrs ?? null);
+
+  // HR chart with avg line + min/max range + sleep RHR
+  hrChart.data.labels = labels;
+  hrChart.data.datasets = [
+    {{
+      label: 'Avg HR',
+      data: hrAvg,
+      borderColor: '#ff6b6b',
+      backgroundColor: 'rgba(255,107,107,0.15)',
+      fill: false,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: '#ff6b6b',
+      borderWidth: 2,
+    }},
+    {{
+      label: 'Sleep RHR',
+      data: sleepRhr,
+      borderColor: '#9b59b6',
+      borderDash: [5, 3],
+      backgroundColor: 'transparent',
+      fill: false,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: '#9b59b6',
+      borderWidth: 2,
+    }},
+    {{
+      label: 'Max HR',
+      data: hrMax,
+      borderColor: 'rgba(255,107,107,0.3)',
+      backgroundColor: 'rgba(255,107,107,0.08)',
+      fill: '+1',
+      tension: 0.3,
+      pointRadius: 0,
+      borderWidth: 1,
+    }},
+    {{
+      label: 'Min HR',
+      data: hrMin,
+      borderColor: 'rgba(255,107,107,0.3)',
+      backgroundColor: 'transparent',
+      fill: false,
+      tension: 0.3,
+      pointRadius: 0,
+      borderWidth: 1,
+    }}
+  ];
+  hrChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
+  hrChart.update();
+
+  hrvChart.data.labels = labels;
+  hrvChart.data.datasets[0].data = hrv;
+  hrvChart.update();
+
+  recoveryChart.data.labels = labels;
+  recoveryChart.data.datasets[0].data = recovery;
+  recoveryChart.options.scales.y.min = 0;
+  recoveryChart.options.scales.y.max = 100;
+  recoveryChart.update();
+
+  sleepChart.data.labels = labels;
+  sleepChart.data.datasets[0].data = sleep;
+  sleepChart.update();
+
+  // Stats cards
+  const avg = (arr) => {{
+    const valid = arr.filter(v => v !== null && v !== undefined);
+    return valid.length ? (valid.reduce((a, b) => a + b, 0) / valid.length) : null;
+  }};
+  const grid = document.getElementById('statsGrid');
+  let cards = '';
+  const aHr = avg(hrAvg);
+  if (aHr !== null) cards += makeStatCard('Avg Heart Rate', aHr.toFixed(0), ' bpm');
+  const aRhr = avg(sleepRhr);
+  if (aRhr !== null) cards += makeStatCard('Sleep Resting HR', aRhr.toFixed(0), ' bpm');
+  const aHrv = avg(hrv);
+  if (aHrv !== null) cards += makeStatCard('Avg HRV', aHrv.toFixed(0), ' ms');
+  const aRec = avg(recovery);
+  if (aRec !== null) cards += makeStatCard('Recovery Score', aRec.toFixed(0), '');
+  const aSleep = avg(sleep);
+  if (aSleep !== null) cards += makeStatCard('Avg Sleep', aSleep.toFixed(1), ' hrs');
+  cards += makeStatCard('Days Tracked', String(days.length), '');
+  grid.innerHTML = cards;
+}}
+
+document.getElementById('prevMonth').addEventListener('click', () => {{
+  if (currentIdx > 0) {{ currentIdx--; updateView(); }}
+}});
+document.getElementById('nextMonth').addEventListener('click', () => {{
+  if (currentIdx < MONTHS.length - 1) {{ currentIdx++; updateView(); }}
+}});
+
+if (MONTHS.length > 0) {{
+  updateView();
+}} else {{
+  document.getElementById('monthLabel').textContent = 'No data';
+  document.getElementById('statsGrid').innerHTML =
+    '<p class="no-data" style="grid-column:1/-1">No historical data available yet.</p>';
+}}
+</script>
+</body>
+</html>
+"""
+
+
 def find_latest_chart(prefix: str) -> Path | None:
     """Find the most recently dated chart file matching a prefix."""
     candidates = sorted(OUTPUT_DIR.glob(f"{prefix}_*.png"))
@@ -301,11 +658,11 @@ def find_latest_chart(prefix: str) -> Path | None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Build Ultrahuman dashboard HTML page")
+    parser = argparse.ArgumentParser(description="Build Ultrahuman dashboard HTML pages")
     parser.add_argument("--test", "--dry-run", dest="test_mode", action="store_true",
                         help="Print HTML to stdout instead of writing to _site/")
     parser.add_argument("--data", default=str(DATA_DIR / "last_7_days.json"),
-                        help="Input JSON data file")
+                        help="Input JSON data file (7-day)")
     args = parser.parse_args()
 
     data_path = Path(args.data)
@@ -327,20 +684,38 @@ def main():
     now = datetime.now(LOCAL_TZ)
     updated = now.strftime("%B %-d, %Y at %-I:%M %p %Z")
 
-    html = build_html(summary, dense_b64, weekly_b64, updated)
+    # --- Build index (weekly) page ---
+    index_html = build_html(summary, dense_b64, weekly_b64, updated)
+
+    # --- Build monthly page ---
+    summaries = load_daily_summaries()
+    summaries_json = json.dumps(summaries)
+    monthly_html = build_monthly_html(summaries_json, updated)
 
     if args.test_mode:
-        print(html)
+        print("=== INDEX.HTML ===")
+        print(index_html[:500], "...\n")
+        print("=== MONTHLY.HTML ===")
+        print(monthly_html[:500], "...\n")
+        print(f"Summaries: {len(summaries)} days loaded")
     else:
         SITE_DIR.mkdir(exist_ok=True)
-        out_path = SITE_DIR / "index.html"
-        with open(out_path, "w") as f:
-            f.write(html)
-        print(f"Dashboard written to {out_path}")
+
+        index_path = SITE_DIR / "index.html"
+        with open(index_path, "w") as f:
+            f.write(index_html)
+        print(f"Weekly dashboard written to {index_path}")
+
+        monthly_path = SITE_DIR / "monthly.html"
+        with open(monthly_path, "w") as f:
+            f.write(monthly_html)
+        print(f"Monthly dashboard written to {monthly_path}")
+
         print(f"  Data range: {summary.get('date_range', 'N/A')}")
         print(f"  HR readings: {summary.get('hr_readings', 0)}")
         print(f"  Dense chart: {dense_path or 'missing'}")
         print(f"  Weekly chart: {weekly_path or 'missing'}")
+        print(f"  Historical days: {len(summaries)}")
 
     return 0
 

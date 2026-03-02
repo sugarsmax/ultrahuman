@@ -28,8 +28,9 @@ wheels/
 .installed.cfg
 *.egg
 
-# Data outputs
+# Data outputs (ephemeral API responses)
 data/*.json
+!data/daily_summaries.json
 
 # Generated site (built by CI)
 _site/
