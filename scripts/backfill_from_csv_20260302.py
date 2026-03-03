@@ -80,6 +80,42 @@ def parse_csv_row(row: dict) -> tuple[str | None, dict]:
     if total_sleep_min is not None:
         summary["sleep_hrs"] = round(total_sleep_min / 60, 2)
 
+    sleep_score = safe_int("Sleep Score")
+    if sleep_score is not None:
+        summary["sleep_score"] = sleep_score
+
+    deep = safe_float("Deep Sleep")
+    if deep is not None:
+        summary["deep_sleep_min"] = deep
+
+    rem = safe_float("REM Sleep")
+    if rem is not None:
+        summary["rem_sleep_min"] = rem
+
+    light = safe_float("Light Sleep")
+    if light is not None:
+        summary["light_sleep_min"] = light
+
+    efficiency = safe_float("Sleep Efficiency")
+    if efficiency is not None:
+        summary["sleep_efficiency"] = efficiency
+
+    awake = safe_float("Sleep Awake Time")
+    if awake is not None and total_sleep_min is not None:
+        summary["time_in_bed_min"] = total_sleep_min + awake
+
+    steps = safe_int("Total Steps")
+    if steps is not None:
+        summary["steps"] = steps
+
+    movement = safe_int("Movement Score")
+    if movement is not None:
+        summary["movement"] = movement
+
+    active = safe_float("Total Activity Minutes")
+    if active is not None:
+        summary["active_min"] = active
+
     return date_str, summary
 
 

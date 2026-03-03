@@ -411,6 +411,17 @@ def build_monthly_html(summaries_json: str, updated: str) -> str:
   .chart-box canvas {{
     width: 100% !important;
   }}
+
+  .section-heading {{
+    font-size: 0.75rem;
+    color: #58a6ff;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin: 2rem 0 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #21262d;
+  }}
 </style>
 </head>
 <body>
@@ -430,6 +441,30 @@ def build_monthly_html(summaries_json: str, updated: str) -> str:
 
   <div class="stats-grid" id="statsGrid"></div>
 
+  <div class="section-heading">Sleep</div>
+
+  <div class="chart-box">
+    <h2>Sleep Score</h2>
+    <canvas id="sleepScoreChart" height="160"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Sleep Duration &amp; Time in Bed</h2>
+    <canvas id="sleepChart" height="180"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Sleep Stages</h2>
+    <canvas id="sleepStagesChart" height="200"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Sleep Efficiency</h2>
+    <canvas id="efficiencyChart" height="160"></canvas>
+  </div>
+
+  <div class="section-heading">Heart Rate &amp; HRV</div>
+
   <div class="chart-box">
     <h2>Heart Rate</h2>
     <canvas id="hrChart" height="200"></canvas>
@@ -440,14 +475,16 @@ def build_monthly_html(summaries_json: str, updated: str) -> str:
     <canvas id="hrvChart" height="160"></canvas>
   </div>
 
+  <div class="section-heading">Recovery &amp; Activity</div>
+
   <div class="chart-box">
     <h2>Recovery Score</h2>
     <canvas id="recoveryChart" height="160"></canvas>
   </div>
 
   <div class="chart-box">
-    <h2>Sleep Duration</h2>
-    <canvas id="sleepChart" height="160"></canvas>
+    <h2>SpO2</h2>
+    <canvas id="spo2Chart" height="140"></canvas>
   </div>
 
   <footer>
@@ -495,34 +532,50 @@ function makeChart(canvasId, label, color, fillColor) {{
   const ctx = document.getElementById(canvasId).getContext('2d');
   return new Chart(ctx, {{
     type: 'line',
-    data: {{
-      labels: [],
-      datasets: [{{
-        label: label,
-        data: [],
-        borderColor: color,
-        backgroundColor: fillColor || 'transparent',
-        fill: !!fillColor,
-        tension: 0.3,
-        pointRadius: 3,
-        pointBackgroundColor: color,
-        borderWidth: 2,
-      }}]
-    }},
+    data: {{ labels: [], datasets: [{{
+      label: label, data: [],
+      borderColor: color,
+      backgroundColor: fillColor || 'transparent',
+      fill: !!fillColor, tension: 0.3,
+      pointRadius: 3, pointBackgroundColor: color, borderWidth: 2,
+    }}] }},
     options: structuredClone(chartDefaults)
   }});
 }}
 
+function makeBarChart(canvasId) {{
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  return new Chart(ctx, {{
+    type: 'bar',
+    data: {{ labels: [], datasets: [] }},
+    options: structuredClone(chartDefaults)
+  }});
+}}
+
+// Sleep charts
+const sleepScoreChart = makeChart('sleepScoreChart', 'Sleep Score', '#58a6ff', 'rgba(88,166,255,0.15)');
+const sleepChart = makeChart('sleepChart', 'Sleep', '#9b59b6', 'rgba(155,89,182,0.15)');
+const sleepStagesChart = makeBarChart('sleepStagesChart');
+const efficiencyChart = makeChart('efficiencyChart', 'Efficiency', '#4ecdc4', 'rgba(78,205,196,0.15)');
+
+// HR charts
 const hrChart = makeChart('hrChart', 'Avg HR', '#ff6b6b', 'rgba(255,107,107,0.15)');
 const hrvChart = makeChart('hrvChart', 'HRV', '#4ecdc4', 'rgba(78,205,196,0.15)');
+
+// Recovery & activity
 const recoveryChart = makeChart('recoveryChart', 'Recovery', '#87bc40', 'rgba(135,188,64,0.15)');
-const sleepChart = makeChart('sleepChart', 'Sleep (hrs)', '#9b59b6', 'rgba(155,89,182,0.15)');
+const spo2Chart = makeChart('spo2Chart', 'SpO2', '#f09d4f', 'rgba(240,157,79,0.15)');
 
 function makeStatCard(label, value, unit) {{
   return '<div class="stat-card">'
     + '<div class="stat-value">' + value + '<span class="stat-unit">' + (unit || '') + '</span></div>'
     + '<div class="stat-label">' + label + '</div></div>';
 }}
+
+const avg = (arr) => {{
+  const valid = arr.filter(v => v !== null && v !== undefined);
+  return valid.length ? (valid.reduce((a, b) => a + b, 0) / valid.length) : null;
+}};
 
 function updateView() {{
   const month = MONTHS[currentIdx];
@@ -533,102 +586,157 @@ function updateView() {{
   document.getElementById('prevMonth').disabled = (currentIdx === 0);
   document.getElementById('nextMonth').disabled = (currentIdx === MONTHS.length - 1);
 
-  const days = Object.keys(ALL_DATA)
-    .filter(d => d.startsWith(month))
-    .sort();
-
+  const days = Object.keys(ALL_DATA).filter(d => d.startsWith(month)).sort();
   const labels = days.map(d => parseInt(d.split('-')[2]));
-  const hrAvg = days.map(d => ALL_DATA[d].hr_avg ?? null);
-  const hrMin = days.map(d => ALL_DATA[d].hr_min ?? null);
-  const hrMax = days.map(d => ALL_DATA[d].hr_max ?? null);
-  const sleepRhr = days.map(d => ALL_DATA[d].sleep_rhr ?? null);
-  const hrv = days.map(d => ALL_DATA[d].hrv ?? null);
-  const recovery = days.map(d => ALL_DATA[d].recovery ?? null);
-  const sleep = days.map(d => ALL_DATA[d].sleep_hrs ?? null);
+  const get = (field) => days.map(d => ALL_DATA[d][field] ?? null);
 
-  // HR chart with avg line + min/max range + sleep RHR
+  // Data arrays
+  const hrAvg = get('hr_avg');
+  const hrMin = get('hr_min');
+  const hrMax = get('hr_max');
+  const sleepRhr = get('sleep_rhr');
+  const hrv = get('hrv');
+  const sleepHrv = get('sleep_hrv');
+  const recovery = get('recovery');
+  const sleepHrs = get('sleep_hrs');
+  const sleepScore = get('sleep_score');
+  const deepMin = get('deep_sleep_min');
+  const remMin = get('rem_sleep_min');
+  const lightMin = get('light_sleep_min');
+  const sleepEff = get('sleep_efficiency');
+  const tibMin = get('time_in_bed_min');
+  const spo2 = get('spo2');
+
+  // --- Stats cards ---
+  const grid = document.getElementById('statsGrid');
+  let cards = '';
+  const aScore = avg(sleepScore);
+  if (aScore !== null) cards += makeStatCard('Sleep Score', aScore.toFixed(0), '');
+  const aSleep = avg(sleepHrs);
+  if (aSleep !== null) cards += makeStatCard('Avg Sleep', aSleep.toFixed(1), ' hrs');
+  const aEff = avg(sleepEff);
+  if (aEff !== null) cards += makeStatCard('Sleep Efficiency', aEff.toFixed(0), '%');
+  const aRhr = avg(sleepRhr);
+  if (aRhr !== null) cards += makeStatCard('Sleep RHR', aRhr.toFixed(0), ' bpm');
+  const aHrv = avg(hrv);
+  if (aHrv !== null) cards += makeStatCard('Avg HRV', aHrv.toFixed(0), ' ms');
+  const aRec = avg(recovery);
+  if (aRec !== null) cards += makeStatCard('Recovery', aRec.toFixed(0), '');
+  cards += makeStatCard('Days Tracked', String(days.length), '');
+  grid.innerHTML = cards;
+
+  // --- Sleep Score chart ---
+  sleepScoreChart.data.labels = labels;
+  sleepScoreChart.data.datasets[0].data = sleepScore;
+  sleepScoreChart.options.scales.y.min = 0;
+  sleepScoreChart.options.scales.y.max = 100;
+  sleepScoreChart.update();
+
+  // --- Sleep Duration chart ---
+  const tibHrs = tibMin.map(v => v !== null ? +(v / 60).toFixed(2) : null);
+  sleepChart.data.labels = labels;
+  sleepChart.data.datasets = [
+    {{
+      label: 'Total Sleep',
+      data: sleepHrs,
+      borderColor: '#9b59b6',
+      backgroundColor: 'rgba(155,89,182,0.15)',
+      fill: true, tension: 0.3,
+      pointRadius: 3, pointBackgroundColor: '#9b59b6', borderWidth: 2,
+    }},
+    {{
+      label: 'Time in Bed',
+      data: tibHrs,
+      borderColor: 'rgba(155,89,182,0.4)',
+      borderDash: [5, 3],
+      backgroundColor: 'transparent',
+      fill: false, tension: 0.3,
+      pointRadius: 2, pointBackgroundColor: 'rgba(155,89,182,0.4)', borderWidth: 1.5,
+    }}
+  ];
+  sleepChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
+  sleepChart.update();
+
+  // --- Sleep Stages stacked bar ---
+  const deepHrs = deepMin.map(v => v !== null ? +(v / 60).toFixed(2) : null);
+  const remHrs = remMin.map(v => v !== null ? +(v / 60).toFixed(2) : null);
+  const lightHrs = lightMin.map(v => v !== null ? +(v / 60).toFixed(2) : null);
+  sleepStagesChart.data.labels = labels;
+  sleepStagesChart.data.datasets = [
+    {{ label: 'Deep', data: deepHrs, backgroundColor: '#1a6bff', borderRadius: 2 }},
+    {{ label: 'REM', data: remHrs, backgroundColor: '#a80c7c', borderRadius: 2 }},
+    {{ label: 'Light', data: lightHrs, backgroundColor: '#36a5cc', borderRadius: 2 }},
+  ];
+  sleepStagesChart.options.scales.x.stacked = true;
+  sleepStagesChart.options.scales.y.stacked = true;
+  sleepStagesChart.options.scales.y.title = {{ display: true, text: 'Hours', color: '#8b949e' }};
+  sleepStagesChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
+  sleepStagesChart.update();
+
+  // --- Sleep Efficiency chart ---
+  efficiencyChart.data.labels = labels;
+  efficiencyChart.data.datasets[0].data = sleepEff;
+  efficiencyChart.options.scales.y.min = 70;
+  efficiencyChart.options.scales.y.max = 100;
+  efficiencyChart.update();
+
+  // --- HR chart ---
   hrChart.data.labels = labels;
   hrChart.data.datasets = [
     {{
-      label: 'Avg HR',
-      data: hrAvg,
-      borderColor: '#ff6b6b',
-      backgroundColor: 'rgba(255,107,107,0.15)',
-      fill: false,
-      tension: 0.3,
-      pointRadius: 3,
-      pointBackgroundColor: '#ff6b6b',
-      borderWidth: 2,
+      label: 'Avg HR', data: hrAvg,
+      borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.15)',
+      fill: false, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#ff6b6b', borderWidth: 2,
     }},
     {{
-      label: 'Sleep RHR',
-      data: sleepRhr,
-      borderColor: '#9b59b6',
-      borderDash: [5, 3],
-      backgroundColor: 'transparent',
-      fill: false,
-      tension: 0.3,
-      pointRadius: 3,
-      pointBackgroundColor: '#9b59b6',
-      borderWidth: 2,
+      label: 'Sleep RHR', data: sleepRhr,
+      borderColor: '#9b59b6', borderDash: [5, 3], backgroundColor: 'transparent',
+      fill: false, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#9b59b6', borderWidth: 2,
     }},
     {{
-      label: 'Max HR',
-      data: hrMax,
-      borderColor: 'rgba(255,107,107,0.3)',
-      backgroundColor: 'rgba(255,107,107,0.08)',
-      fill: '+1',
-      tension: 0.3,
-      pointRadius: 0,
-      borderWidth: 1,
+      label: 'Max HR', data: hrMax,
+      borderColor: 'rgba(255,107,107,0.3)', backgroundColor: 'rgba(255,107,107,0.08)',
+      fill: '+1', tension: 0.3, pointRadius: 0, borderWidth: 1,
     }},
     {{
-      label: 'Min HR',
-      data: hrMin,
-      borderColor: 'rgba(255,107,107,0.3)',
-      backgroundColor: 'transparent',
-      fill: false,
-      tension: 0.3,
-      pointRadius: 0,
-      borderWidth: 1,
+      label: 'Min HR', data: hrMin,
+      borderColor: 'rgba(255,107,107,0.3)', backgroundColor: 'transparent',
+      fill: false, tension: 0.3, pointRadius: 0, borderWidth: 1,
     }}
   ];
   hrChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
   hrChart.update();
 
+  // --- HRV chart ---
   hrvChart.data.labels = labels;
-  hrvChart.data.datasets[0].data = hrv;
+  hrvChart.data.datasets = [
+    {{
+      label: 'Daily HRV', data: hrv,
+      borderColor: '#4ecdc4', backgroundColor: 'rgba(78,205,196,0.15)',
+      fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#4ecdc4', borderWidth: 2,
+    }},
+    {{
+      label: 'Sleep HRV', data: sleepHrv,
+      borderColor: '#88a943', borderDash: [5, 3], backgroundColor: 'transparent',
+      fill: false, tension: 0.3, pointRadius: 2, pointBackgroundColor: '#88a943', borderWidth: 1.5,
+    }}
+  ];
+  hrvChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
   hrvChart.update();
 
+  // --- Recovery chart ---
   recoveryChart.data.labels = labels;
   recoveryChart.data.datasets[0].data = recovery;
   recoveryChart.options.scales.y.min = 0;
   recoveryChart.options.scales.y.max = 100;
   recoveryChart.update();
 
-  sleepChart.data.labels = labels;
-  sleepChart.data.datasets[0].data = sleep;
-  sleepChart.update();
-
-  // Stats cards
-  const avg = (arr) => {{
-    const valid = arr.filter(v => v !== null && v !== undefined);
-    return valid.length ? (valid.reduce((a, b) => a + b, 0) / valid.length) : null;
-  }};
-  const grid = document.getElementById('statsGrid');
-  let cards = '';
-  const aHr = avg(hrAvg);
-  if (aHr !== null) cards += makeStatCard('Avg Heart Rate', aHr.toFixed(0), ' bpm');
-  const aRhr = avg(sleepRhr);
-  if (aRhr !== null) cards += makeStatCard('Sleep Resting HR', aRhr.toFixed(0), ' bpm');
-  const aHrv = avg(hrv);
-  if (aHrv !== null) cards += makeStatCard('Avg HRV', aHrv.toFixed(0), ' ms');
-  const aRec = avg(recovery);
-  if (aRec !== null) cards += makeStatCard('Recovery Score', aRec.toFixed(0), '');
-  const aSleep = avg(sleep);
-  if (aSleep !== null) cards += makeStatCard('Avg Sleep', aSleep.toFixed(1), ' hrs');
-  cards += makeStatCard('Days Tracked', String(days.length), '');
-  grid.innerHTML = cards;
+  // --- SpO2 chart ---
+  spo2Chart.data.labels = labels;
+  spo2Chart.data.datasets[0].data = spo2;
+  spo2Chart.options.scales.y.min = 90;
+  spo2Chart.options.scales.y.max = 100;
+  spo2Chart.update();
 }}
 
 document.getElementById('prevMonth').addEventListener('click', () => {{
