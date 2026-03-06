@@ -46,28 +46,13 @@ def load_all_data(json_path):
     """
     Load all metrics data from JSON file.
     
-    Supports two formats:
-      - Dict with data.metrics (single API response)
-      - List of {date, data: {data: {metrics: {...}}}} (multi-day query output)
-    
     Returns:
         tuple: (hr_df, sleep_df) DataFrames
     """
     with open(json_path, "r") as f:
         data = json.load(f)
     
-    # Merge metrics from list-of-days format into a single dict
-    if isinstance(data, list):
-        metrics = {}
-        for entry in data:
-            day_metrics = (
-                entry.get("data", {})
-                .get("data", {})
-                .get("metrics", {})
-            )
-            metrics.update(day_metrics)
-    else:
-        metrics = data.get("data", {}).get("metrics", {})
+    metrics = data.get("data", {}).get("metrics", {})
     
     # Extract HR data
     hr_records = []
@@ -219,14 +204,17 @@ def create_dense_chart(hr_df, sleep_df, output_path=None, show=False):
         plt.close()
 
 
-def create_weekly_chart(hr_df, sleep_df, output_path=None, show=False):
+def create_weekly_chart(hr_df, sleep_df, output_path=None, show=False, week_offset=0):
     """
     Create 7-day aggregated HR chart with daily stats and sleep RHR overlay.
+
+    Args:
+        week_offset: How many weeks back to show (0 = most recent, 1 = 1 week ago, etc.)
     """
     if hr_df.empty:
         print("No HR data available for weekly chart")
         return
-    
+
     # Aggregate by date
     daily = hr_df.groupby("date").agg(
         avg=("value", "mean"),
@@ -237,15 +225,28 @@ def create_weekly_chart(hr_df, sleep_df, output_path=None, show=False):
     ).reset_index()
     daily["date_dt"] = pd.to_datetime(daily["date"])
     daily = daily.sort_values("date_dt")
-    
+
     # Merge with sleep data
     if not sleep_df.empty:
         daily = daily.merge(sleep_df[["date", "sleep_rhr"]], on="date", how="left")
     else:
         daily["sleep_rhr"] = None
-    
-    # Take last 7 days
-    daily = daily.tail(7)
+
+    # Select the 7-day window for the requested offset
+    total_days = len(daily)
+    end_idx = total_days - week_offset * 7
+    start_idx = end_idx - 7
+
+    if end_idx <= 0:
+        print(f"No data available for week offset {week_offset} (only {total_days} days of data loaded).")
+        return
+
+    start_idx = max(start_idx, 0)
+    daily = daily.iloc[start_idx:end_idx]
+
+    if daily.empty:
+        print(f"No data in the requested week window (offset={week_offset}).")
+        return
     
     # Style settings
     plt.style.use("dark_background")
@@ -291,23 +292,30 @@ def create_weekly_chart(hr_df, sleep_df, output_path=None, show=False):
     ax.set_axisbelow(True)
     
     # Styling
+    date_from = daily["date_dt"].min().strftime("%b %d")
+    date_to = daily["date_dt"].max().strftime("%b %d, %Y")
+    week_label = f"Week of {date_from} – {date_to}"
+    if week_offset > 0:
+        week_label += f"  ({week_offset} week{'s' if week_offset > 1 else ''} ago)"
+
     ax.set_xlabel("Date", fontsize=11, color="#888888", fontweight="medium")
     ax.set_ylabel("Heart Rate (bpm)", fontsize=11, color="#888888", fontweight="medium")
-    ax.set_title("Heart Rate - 7 Day Overview (Awake + Sleep)", 
+    ax.set_title(f"Heart Rate - {week_label}", 
                  fontsize=16, color="#ffffff", fontweight="bold", pad=15)
-    
+
     # Format x-axis
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%a\n%b %d"))
     plt.xticks(daily["date_dt"], fontsize=10, color="#888888")
     plt.yticks(fontsize=10, color="#888888")
-    
+
     # Add overall stats
     overall_avg = daily["avg"].mean()
     overall_min = daily["min"].min()
     overall_max = daily["max"].max()
     sleep_avg = daily["sleep_rhr"].mean() if daily["sleep_rhr"].notna().any() else None
-    
-    stats_text = f"7-Day Awake Avg: {overall_avg:.0f} bpm  |  Range: {overall_min:.0f}-{overall_max:.0f}"
+
+    n_days = len(daily)
+    stats_text = f"{n_days}-Day Awake Avg: {overall_avg:.0f} bpm  |  Range: {overall_min:.0f}-{overall_max:.0f}"
     if sleep_avg:
         stats_text += f"  |  Sleep RHR Avg: {sleep_avg:.0f}"
     ax.text(0.02, 0.95, stats_text, transform=ax.transAxes,
@@ -348,6 +356,16 @@ def main():
                         help="Show charts interactively instead of saving")
     parser.add_argument("--input", "-i", default=str(DATA_DIR / "last_7_days.json"),
                         help="Input JSON file path")
+    parser.add_argument(
+        "--week-offset", "-w",
+        dest="week_offset",
+        type=int,
+        default=0,
+        choices=range(5),
+        metavar="N",
+        help="Show N weeks back (0=current, 1=last week, ..., 4=four weeks ago). "
+             "Requires sufficient data in the input file."
+    )
     args = parser.parse_args()
     
     # Ensure output directory exists
@@ -372,13 +390,21 @@ def main():
     # Generate charts
     print("\nGenerating charts...")
     
+    if args.week_offset > 0:
+        print(f"Weekly chart: showing {args.week_offset} week{'s' if args.week_offset > 1 else ''} ago")
+
     if args.test_mode:
         create_dense_chart(hr_df, sleep_df, show=True)
-        create_weekly_chart(hr_df, sleep_df, show=True)
+        create_weekly_chart(hr_df, sleep_df, show=True, week_offset=args.week_offset)
     else:
         timestamp = datetime.now().strftime("%Y%m%d")
+        week_suffix = f"_w{args.week_offset}" if args.week_offset > 0 else ""
         create_dense_chart(hr_df, sleep_df, OUTPUT_DIR / f"hr_dense_{timestamp}.png")
-        create_weekly_chart(hr_df, sleep_df, OUTPUT_DIR / f"hr_weekly_{timestamp}.png")
+        create_weekly_chart(
+            hr_df, sleep_df,
+            OUTPUT_DIR / f"hr_weekly_{timestamp}{week_suffix}.png",
+            week_offset=args.week_offset
+        )
         print(f"\nCharts saved to: {OUTPUT_DIR}")
     
     return 0

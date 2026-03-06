@@ -157,6 +157,15 @@ def main():
         default=10,
         help="Maximum number of days to query (default: 10)"
     )
+    parser.add_argument(
+        "--weeks-back",
+        dest="weeks_back",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Fetch N weeks of history ending today (e.g. --weeks-back 4 fetches 28 days). "
+             "Overrides --date, --start-date, and --end-date."
+    )
     
     args = parser.parse_args()
     
@@ -169,8 +178,15 @@ def main():
     
     # Determine date range
     today = datetime.now().date()
-    
-    if args.continue_from_last:
+
+    if args.weeks_back is not None:
+        start_date = today - timedelta(days=args.weeks_back * 7 - 1)
+        end_date = today
+        # Override the default limit so it covers the full requested window
+        if args.limit < args.weeks_back * 7:
+            args.limit = args.weeks_back * 7
+        print(f"Fetching {args.weeks_back} week(s) of history: {start_date} to {end_date}")
+    elif args.continue_from_last:
         state = load_state()
         last_date = state.get("last_queried_date")
         if last_date:
@@ -225,7 +241,6 @@ def main():
     # Output results
     if args.output:
         output_path = Path(args.output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             json.dump(results, f, indent=2)
         print(f"\nResults saved to: {output_path}")
