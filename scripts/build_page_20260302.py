@@ -265,8 +265,17 @@ def build_nav(active: str) -> str:
     return f'<nav>{"".join(parts)}</nav>'
 
 
-def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, updated: str) -> str:
-    """Assemble the weekly (index) HTML page."""
+def build_html(
+    summary: dict,
+    dense_b64: str | None,
+    weekly_charts: list[tuple[str, str]],
+    updated: str,
+) -> str:
+    """Assemble the weekly (index) HTML page.
+
+    Args:
+        weekly_charts: List of (label, base64_png) tuples ordered current → oldest.
+    """
 
     cards = []
     if "hr_avg" in summary:
@@ -288,11 +297,32 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
         if dense_b64
         else '<p class="no-data">Dense chart not available</p>'
     )
-    weekly_img = (
-        f'<img src="data:image/png;base64,{weekly_b64}" alt="Heart rate 7-day overview">'
-        if weekly_b64
-        else '<p class="no-data">Weekly chart not available</p>'
-    )
+
+    # Build week-navigation panel
+    if weekly_charts:
+        tab_buttons = "\n".join(
+            f'  <button class="week-tab{" active" if i == 0 else ""}" '
+            f'onclick="showWeek({i})">{label}</button>'
+            for i, (label, _) in enumerate(weekly_charts)
+        )
+        tab_panels = "\n".join(
+            f'  <div class="week-panel{" active" if i == 0 else ""}" id="week-{i}">'
+            f'<img src="data:image/png;base64,{b64}" alt="Heart rate {lbl}"></div>'
+            for i, (lbl, b64) in enumerate(weekly_charts)
+        )
+        weekly_section = f"""
+  <div class="week-tabs">{tab_buttons}</div>
+  <div class="week-panels">
+{tab_panels}
+  </div>
+  <script>
+    function showWeek(idx) {{
+      document.querySelectorAll('.week-tab').forEach((b, i) => b.classList.toggle('active', i === idx));
+      document.querySelectorAll('.week-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+    }}
+  </script>"""
+    else:
+        weekly_section = '<p class="no-data">Weekly chart not available</p>'
 
     nav = build_nav("index.html")
 
@@ -305,6 +335,26 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
 <style>
 {SHARED_CSS}
 {NAV_CSS}
+  .week-tabs {{
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }}
+  .week-tab {{
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #8b949e;
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }}
+  .week-tab:hover {{ border-color: #58a6ff; color: #f0f6fc; }}
+  .week-tab.active {{ border-color: #58a6ff; color: #f0f6fc; background: #1f3a5c; }}
+  .week-panel {{ display: none; }}
+  .week-panel.active {{ display: block; }}
 </style>
 </head>
 <body>
@@ -327,7 +377,7 @@ def build_html(summary: dict, dense_b64: str | None, weekly_b64: str | None, upd
 
   <div class="chart-section">
     <h2>7-Day Heart Rate Overview</h2>
-    {weekly_img}
+    {weekly_section}
   </div>
 
   <footer>
@@ -765,6 +815,41 @@ def find_latest_chart(prefix: str) -> Path | None:
     return candidates[-1] if candidates else None
 
 
+def find_weekly_charts() -> list[tuple[str, Path]]:
+    """Return all weekly chart PNGs for the latest date, ordered current → oldest.
+
+    Filenames follow the convention:
+        hr_weekly_YYYYMMDD.png        (week offset 0, this week)
+        hr_weekly_YYYYMMDD_w1.png     (1 week ago)
+        hr_weekly_YYYYMMDD_w2.png     (2 weeks ago)
+        ...
+    """
+    import re
+    all_weekly = list(OUTPUT_DIR.glob("hr_weekly_*.png"))
+    if not all_weekly:
+        return []
+
+    latest_date = max(
+        (m.group(1) for p in all_weekly if (m := re.match(r"hr_weekly_(\d{8})", p.name))),
+        default=None,
+    )
+    if not latest_date:
+        return []
+
+    charts: list[tuple[str, Path]] = []
+    w0 = OUTPUT_DIR / f"hr_weekly_{latest_date}.png"
+    if w0.exists():
+        charts.append(("This Week", w0))
+
+    offset_labels = ["1 Week Ago", "2 Weeks Ago", "3 Weeks Ago", "4 Weeks Ago"]
+    for i, label in enumerate(offset_labels, start=1):
+        wi = OUTPUT_DIR / f"hr_weekly_{latest_date}_w{i}.png"
+        if wi.exists():
+            charts.append((label, wi))
+
+    return charts
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build Ultrahuman dashboard HTML pages")
     parser.add_argument("--test", "--dry-run", dest="test_mode", action="store_true",
@@ -781,19 +866,19 @@ def main():
     summary = extract_summary(data_path)
 
     dense_path = find_latest_chart("hr_dense")
-    weekly_path = find_latest_chart("hr_weekly")
-
     dense_b64 = encode_image(dense_path) if dense_path else None
-    weekly_b64 = encode_image(weekly_path) if weekly_path else None
 
-    if not dense_b64 and not weekly_b64:
+    weekly_chart_paths = find_weekly_charts()
+    weekly_charts = [(label, encode_image(path)) for label, path in weekly_chart_paths]
+
+    if not dense_b64 and not weekly_charts:
         print("Warning: No chart images found in output/. Run hr_charts first.", file=sys.stderr)
 
     now = datetime.now(LOCAL_TZ)
     updated = now.strftime("%B %-d, %Y at %-I:%M %p %Z")
 
     # --- Build index (weekly) page ---
-    index_html = build_html(summary, dense_b64, weekly_b64, updated)
+    index_html = build_html(summary, dense_b64, weekly_charts, updated)
 
     # --- Build monthly page ---
     summaries = load_daily_summaries()
@@ -822,7 +907,7 @@ def main():
         print(f"  Data range: {summary.get('date_range', 'N/A')}")
         print(f"  HR readings: {summary.get('hr_readings', 0)}")
         print(f"  Dense chart: {dense_path or 'missing'}")
-        print(f"  Weekly chart: {weekly_path or 'missing'}")
+        print(f"  Weekly charts: {len(weekly_charts)} week(s) – {[l for l, _ in weekly_charts]}")
         print(f"  Historical days: {len(summaries)}")
 
     return 0
