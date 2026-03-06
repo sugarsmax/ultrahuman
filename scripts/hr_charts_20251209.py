@@ -51,8 +51,18 @@ def load_all_data(json_path):
     """
     with open(json_path, "r") as f:
         data = json.load(f)
-    
-    metrics = data.get("data", {}).get("metrics", {})
+
+    if isinstance(data, list):
+        metrics = {}
+        for entry in data:
+            day_metrics = (
+                entry.get("data", {})
+                .get("data", {})
+                .get("metrics", {})
+            )
+            metrics.update(day_metrics)
+    else:
+        metrics = data.get("data", {}).get("metrics", {})
     
     # Extract HR data
     hr_records = []
