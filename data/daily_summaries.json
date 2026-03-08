@@ -951,12 +951,12 @@
     "active_min": 0
   },
   "2026-02-15": {
-    "hr_avg": 67.3,
+    "hr_avg": 76.2,
     "hr_min": 51,
     "hr_max": 102,
-    "hr_readings": 28,
-    "hrv": 50,
-    "steps": 620,
+    "hr_readings": 16,
+    "hrv": 57,
+    "steps": 609,
     "spo2": 98,
     "movement": 54,
     "vo2_max": 42,
