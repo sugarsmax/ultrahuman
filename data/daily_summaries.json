@@ -1377,15 +1377,26 @@
     "light_sleep_min": 115,
     "sleep_efficiency": 94,
     "time_in_bed_min": 335,
-    "recovery": 63,
+    "recovery": 69,
     "steps": 7054,
     "spo2": 97,
-    "movement": 100,
+    "movement": 84,
     "vo2_max": 42,
     "active_min": 0
   },
   "2026-03-08": {
-    "sleep_rhr": 52,
+    "hr_avg": 77.8,
+    "hr_min": 50,
+    "hr_max": 106,
+    "hr_readings": 13,
+    "hrv": 82,
+    "steps": 4725,
+    "spo2": 98,
+    "movement": 74,
+    "vo2_max": 42,
+    "active_min": 50
+  },
+  "2026-03-09": {
     "vo2_max": 42
   }
 }
