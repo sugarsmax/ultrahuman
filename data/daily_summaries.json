@@ -1787,12 +1787,12 @@
     "active_min": 10
   },
   "2026-03-28": {
-    "hr_avg": 61.0,
+    "hr_avg": 62.6,
     "hr_min": 44,
-    "hr_max": 78,
-    "hr_readings": 84,
+    "hr_max": 98,
+    "hr_readings": 92,
     "sleep_rhr": 55,
-    "hrv": 36,
+    "hrv": 41,
     "sleep_hrv": 31,
     "sleep_score": 87,
     "sleep_hrs": 6.75,
@@ -1802,10 +1802,14 @@
     "sleep_efficiency": 96,
     "time_in_bed_min": 420,
     "recovery": 78,
-    "steps": 136,
-    "spo2": 98,
-    "movement": 57,
+    "steps": 6955,
+    "spo2": 97,
+    "movement": 90,
     "vo2_max": 40,
     "active_min": 0
+  },
+  "2026-03-29": {
+    "sleep_rhr": 55,
+    "vo2_max": 40
   }
 }
