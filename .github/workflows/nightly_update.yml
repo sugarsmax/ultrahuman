@@ -2,9 +2,11 @@ name: Nightly Dashboard Update
 
 on:
   schedule:
-    # 17:00 UTC = 9 AM PST (UTC-8)
+    # 9:00 AM PST
     - cron: "0 17 * * *"
-    # 05:00 UTC = 9 PM PST (UTC-8)
+    # 12:00 PM PST (New)
+    - cron: "0 20 * * *"
+    # 9:00 PM PST
     - cron: "0 5 * * *"
   workflow_dispatch:  # allow manual trigger
 
