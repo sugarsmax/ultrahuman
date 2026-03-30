@@ -2,16 +2,12 @@ name: Nightly Dashboard Update
 
 on:
   schedule:
-    # 9:00 AM PST
-    - cron: "0 17 * * *"
-    # 12:00 PM PST (New)
-    - cron: "0 20 * * *"
-    # 9:00 PM PST
-    - cron: "0 5 * * *"
-  workflow_dispatch: # allow manual trigger
+    - cron: "0 17 * * *" # 9:00 AM PST
+    - cron: "0 20 * * *" # 12:00 PM PST
+    - cron: "0 5 * * *"  # 9:00 PM PST
+  workflow_dispatch:
 
 env:
-  # Opts into the Node 24 runtime now to suppress warnings
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
@@ -31,10 +27,13 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2 # Check for v5/v6 if warnings persist
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5.5.0 # Updated from v5 to latest patch/minor
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -72,8 +71,8 @@ jobs:
         run: python scripts/build_page_20260302.py --data data/last_7_days.json
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3.1.1 # Updated to latest patch
+        uses: actions/upload-pages-artifact@v3
 
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@v5 # Updated from v4
+        uses: actions/deploy-pages@v4
