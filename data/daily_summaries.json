@@ -1784,7 +1784,7 @@
     "spo2": 98,
     "movement": 78,
     "vo2_max": 40,
-    "active_min": 10
+    "active_min": 5
   },
   "2026-03-28": {
     "hr_avg": 62.1,
