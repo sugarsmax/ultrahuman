@@ -8,7 +8,11 @@ on:
     - cron: "0 20 * * *"
     # 9:00 PM PST
     - cron: "0 5 * * *"
-  workflow_dispatch:  # allow manual trigger
+  workflow_dispatch: # allow manual trigger
+
+env:
+  # Opts into the Node 24 runtime now to suppress warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: write
@@ -25,16 +29,12 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2 # Check for v5/v6 if warnings persist
 
       - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
+        uses: actions/setup-python@v5.5.0 # Updated from v5 to latest patch/minor
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -72,10 +72,8 @@ jobs:
         run: python scripts/build_page_20260302.py --data data/last_7_days.json
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
+        uses: actions/upload-pages-artifact@v3.1.1 # Updated to latest patch
 
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5 # Updated from v4
