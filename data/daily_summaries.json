@@ -1851,5 +1851,10 @@
     "movement": 75,
     "vo2_max": 40,
     "active_min": 35
+  },
+  "2026-03-31": {
+    "sleep_rhr": 54,
+    "steps": 0,
+    "vo2_max": 40
   }
 }
