@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib.ticker import FuncFormatter
 import pandas as pd
 
 # Optional: load from .env file
@@ -128,10 +129,10 @@ def load_all_data(json_path):
 
 def create_dense_chart(hr_df, sleep_df, output_path=None, show=False):
     """
-    Create chart of most recent 100 HR intervals with sleep periods marked.
+    Create chart of most recent 200 HR intervals with sleep periods marked.
     """
-    # Get last 100 readings
-    recent = hr_df.tail(100).copy()
+    # Get last 200 readings
+    recent = hr_df.tail(200).copy()
     
     if recent.empty:
         print("No HR data available for dense chart")
@@ -177,11 +178,20 @@ def create_dense_chart(hr_df, sleep_df, output_path=None, show=False):
     # Styling
     ax.set_xlabel("Time (Local)", fontsize=11, color="#888888", fontweight="medium")
     ax.set_ylabel("Heart Rate (bpm)", fontsize=11, color="#888888", fontweight="medium")
-    ax.set_title("Heart Rate - Last 100 Readings", 
+    ax.set_title("Heart Rate - Last 200 Readings", 
                  fontsize=16, color="#ffffff", fontweight="bold", pad=15)
     
     # Format x-axis for local time
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d\n%I:%M %p"))
+    def local_time_formatter(x, pos):
+        # Convert matplotlib date number to datetime and format in local timezone
+        dt = mdates.num2date(x)
+        if LOCAL_TZ and dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc).astimezone(LOCAL_TZ)
+        elif LOCAL_TZ:
+            dt = dt.astimezone(LOCAL_TZ)
+        return dt.strftime("%b %d\n%I:%M %p")
+    
+    ax.xaxis.set_major_formatter(FuncFormatter(local_time_formatter))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     plt.xticks(rotation=0, fontsize=9, color="#888888")
     plt.yticks(fontsize=9, color="#888888")
