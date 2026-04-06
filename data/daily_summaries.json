@@ -1976,8 +1976,15 @@
     "active_min": 15
   },
   "2026-04-06": {
-    "steps": 0,
-    "movement": 65,
-    "vo2_max": 41
+    "hr_avg": 76.6,
+    "hr_min": 61,
+    "hr_max": 132,
+    "hr_readings": 37,
+    "hrv": 60,
+    "steps": 834,
+    "spo2": 98,
+    "movement": 59,
+    "vo2_max": 41,
+    "active_min": 20
   }
 }
