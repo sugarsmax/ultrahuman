@@ -1968,11 +1968,16 @@
     "light_sleep_min": 280,
     "sleep_efficiency": 97,
     "time_in_bed_min": 430,
-    "recovery": 86,
+    "recovery": 89,
     "steps": 6248,
     "spo2": 98,
-    "movement": 79,
+    "movement": 76,
     "vo2_max": 41,
     "active_min": 15
+  },
+  "2026-04-06": {
+    "steps": 0,
+    "movement": 65,
+    "vo2_max": 41
   }
 }
