@@ -2123,5 +2123,11 @@
     "steps": 0,
     "movement": 57,
     "vo2_max": 42
+  },
+  "2026-04-16": {
+    "sleep_rhr": 50,
+    "steps": 0,
+    "movement": 53,
+    "vo2_max": 42
   }
 }
