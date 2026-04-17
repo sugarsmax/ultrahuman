@@ -2122,12 +2122,36 @@
     "sleep_rhr": 50,
     "steps": 0,
     "movement": 57,
-    "vo2_max": 42
+    "vo2_max": 42,
+    "active_min": 0
   },
   "2026-04-16": {
     "sleep_rhr": 50,
     "steps": 0,
     "movement": 53,
-    "vo2_max": 42
+    "vo2_max": 42,
+    "active_min": 0
+  },
+  "2026-04-17": {
+    "hr_avg": 57.7,
+    "hr_min": 50,
+    "hr_max": 72,
+    "hr_readings": 78,
+    "sleep_rhr": 50,
+    "hrv": 45,
+    "sleep_hrv": 44,
+    "sleep_score": 72,
+    "sleep_hrs": 5.67,
+    "deep_sleep_min": 50,
+    "rem_sleep_min": 60,
+    "light_sleep_min": 230,
+    "sleep_efficiency": 89,
+    "time_in_bed_min": 380,
+    "recovery": 72,
+    "steps": 66,
+    "spo2": 97,
+    "movement": 54,
+    "vo2_max": 42,
+    "active_min": 0
   }
 }
