@@ -1954,6 +1954,10 @@
     "active_min": 90
   },
   "2026-04-05": {
+    "hr_avg": 65.9,
+    "hr_min": 46,
+    "hr_max": 148,
+    "hr_readings": 101,
     "sleep_rhr": 51,
     "hrv": 43,
     "sleep_hrv": 34,
@@ -2326,5 +2330,9 @@
     "movement": 58,
     "vo2_max": 42,
     "active_min": 0
+  },
+  "2026-04-29": {
+    "sleep_rhr": 52,
+    "vo2_max": 42
   }
 }
