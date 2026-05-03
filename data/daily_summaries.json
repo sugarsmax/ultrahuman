@@ -2398,15 +2398,18 @@
     "active_min": 0
   },
   "2026-05-02": {
-    "hr_avg": 42.0,
+    "hr_avg": 60.4,
     "hr_min": 42,
-    "hr_max": 42,
-    "hr_readings": 1,
-    "hrv": 155,
-    "steps": 319,
+    "hr_max": 73,
+    "hr_readings": 7,
+    "hrv": 90,
+    "steps": 6298,
     "spo2": 98,
-    "movement": 54,
+    "movement": 70,
     "vo2_max": 42,
     "active_min": 0
+  },
+  "2026-05-03": {
+    "vo2_max": 42
   }
 }
