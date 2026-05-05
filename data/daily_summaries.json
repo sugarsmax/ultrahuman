@@ -2116,7 +2116,7 @@
     "spo2": 98,
     "movement": 63,
     "vo2_max": 42,
-    "active_min": 5
+    "active_min": 0
   },
   "2026-04-15": {
     "sleep_rhr": 50,
@@ -2449,8 +2449,12 @@
     "recovery": 88,
     "steps": 61,
     "spo2": 98,
-    "movement": 65,
+    "movement": 58,
     "vo2_max": 43,
     "active_min": 0
+  },
+  "2026-05-05": {
+    "sleep_rhr": 52,
+    "vo2_max": 43
   }
 }
