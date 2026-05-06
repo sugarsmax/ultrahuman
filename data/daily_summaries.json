@@ -2064,7 +2064,8 @@
     "sleep_rhr": 53,
     "steps": 0,
     "movement": 62,
-    "vo2_max": 42
+    "vo2_max": 42,
+    "active_min": 0
   },
   "2026-04-12": {
     "sleep_rhr": 53,
