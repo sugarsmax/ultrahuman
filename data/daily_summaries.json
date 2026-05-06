@@ -2064,14 +2064,14 @@
     "sleep_rhr": 53,
     "steps": 0,
     "movement": 62,
-    "vo2_max": 42,
-    "active_min": 0
+    "vo2_max": 42
   },
   "2026-04-12": {
     "sleep_rhr": 53,
     "steps": 0,
     "movement": 57,
-    "vo2_max": 42
+    "vo2_max": 42,
+    "active_min": 0
   },
   "2026-04-13": {
     "hr_avg": 57.8,
@@ -2460,6 +2460,8 @@
   },
   "2026-05-06": {
     "sleep_rhr": 52,
+    "steps": 0,
+    "movement": 58,
     "vo2_max": 43
   }
 }
