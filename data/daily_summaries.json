@@ -2518,15 +2518,18 @@
     "active_min": 0
   },
   "2026-05-09": {
-    "hr_avg": 66.7,
+    "hr_avg": 78.2,
     "hr_min": 45,
-    "hr_max": 79,
-    "hr_readings": 6,
-    "hrv": 92,
-    "steps": 1315,
+    "hr_max": 156,
+    "hr_readings": 15,
+    "hrv": 90,
+    "steps": 3822,
     "spo2": 98,
-    "movement": 61,
+    "movement": 67,
     "vo2_max": 43,
-    "active_min": 0
+    "active_min": 10
+  },
+  "2026-05-10": {
+    "vo2_max": 43
   }
 }
