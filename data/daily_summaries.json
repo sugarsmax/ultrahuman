@@ -2127,6 +2127,7 @@
   },
   "2026-04-16": {
     "sleep_rhr": 50,
+    "steps": 0,
     "movement": 53,
     "vo2_max": 42,
     "active_min": 0
@@ -2147,6 +2148,7 @@
     "sleep_efficiency": 89,
     "time_in_bed_min": 380,
     "recovery": 72,
+    "steps": 66,
     "spo2": 97,
     "movement": 53,
     "vo2_max": 42,
@@ -2154,6 +2156,7 @@
   },
   "2026-04-18": {
     "sleep_rhr": 50,
+    "steps": 0,
     "movement": 53,
     "vo2_max": 42,
     "active_min": 0
@@ -2547,5 +2550,8 @@
     "movement": 52,
     "vo2_max": 43,
     "active_min": 0
+  },
+  "2026-05-11": {
+    "vo2_max": 43
   }
 }
