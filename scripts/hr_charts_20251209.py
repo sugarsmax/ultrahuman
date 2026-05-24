@@ -149,6 +149,15 @@ def create_dense_chart(hr_df, sleep_df, output_path=None, show=False):
     time_min = recent["datetime"].min()
     time_max = recent["datetime"].max()
     
+    # Add alternating day background bands
+    recent["date"] = recent["datetime"].dt.date
+    unique_dates = recent["date"].unique()
+    for day_idx, date in enumerate(unique_dates):
+        if day_idx % 2 == 1:  # Shade odd-numbered days (0-indexed, so 1, 3, 5...)
+            day_start = pd.Timestamp(date, tz=LOCAL_TZ)
+            day_end = day_start + pd.Timedelta(days=1)
+            ax.axvspan(day_start, day_end, alpha=0.08, color="#ffffff", zorder=0)
+    
     # Add sleep period shading
     if not sleep_df.empty and "bed_start_dt" in sleep_df.columns:
         for _, row in sleep_df.iterrows():
@@ -176,23 +185,24 @@ def create_dense_chart(hr_df, sleep_df, output_path=None, show=False):
     ax.set_axisbelow(True)
     
     # Styling
-    ax.set_xlabel("Time (Local)", fontsize=11, color="#888888", fontweight="medium")
+    ax.set_xlabel("", fontsize=0)
     ax.set_ylabel("Heart Rate (bpm)", fontsize=11, color="#888888", fontweight="medium")
     ax.set_title("Heart Rate - Last 200 Readings", 
                  fontsize=16, color="#ffffff", fontweight="bold", pad=15)
     
-    # Format x-axis for local time
-    def local_time_formatter(x, pos):
-        # Convert matplotlib date number to datetime and format in local timezone
+    # Format x-axis: one label per day at midnight, showing "Mon May 24"
+    def day_label_formatter(x, pos):
         dt = mdates.num2date(x)
         if LOCAL_TZ and dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc).astimezone(LOCAL_TZ)
         elif LOCAL_TZ:
             dt = dt.astimezone(LOCAL_TZ)
-        return dt.strftime("%b %d\n%I:%M %p")
-    
-    ax.xaxis.set_major_formatter(FuncFormatter(local_time_formatter))
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        return dt.strftime("%a %b %-d")
+
+    ax.xaxis.set_major_locator(mdates.DayLocator(tz=LOCAL_TZ))
+    ax.xaxis.set_major_formatter(FuncFormatter(day_label_formatter))
+    ax.xaxis.set_minor_locator(mdates.AutoDateLocator())
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
     plt.xticks(rotation=0, fontsize=9, color="#888888")
     plt.yticks(fontsize=9, color="#888888")
     
