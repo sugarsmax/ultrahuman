@@ -2794,7 +2794,16 @@
     "active_min": 0
   },
   "2026-05-30": {
+    "hr_avg": 83.6,
+    "hr_min": 69,
+    "hr_max": 100,
+    "hr_readings": 5,
     "sleep_rhr": 52,
-    "vo2_max": 43
+    "hrv": 85,
+    "steps": 4781,
+    "spo2": 98,
+    "movement": 70,
+    "vo2_max": 43,
+    "active_min": 0
   }
 }
