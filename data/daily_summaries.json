@@ -2794,15 +2794,14 @@
     "active_min": 0
   },
   "2026-05-30": {
-    "hr_avg": 83.6,
+    "hr_avg": 90.0,
     "hr_min": 69,
-    "hr_max": 100,
-    "hr_readings": 5,
-    "sleep_rhr": 52,
-    "hrv": 85,
-    "steps": 4781,
+    "hr_max": 122,
+    "hr_readings": 6,
+    "hrv": 72,
+    "steps": 4859,
     "spo2": 98,
-    "movement": 70,
+    "movement": 66,
     "vo2_max": 43,
     "active_min": 0
   }
