@@ -2806,11 +2806,37 @@
     "active_min": 5
   },
   "2026-05-31": {
-    "steps": 0,
-    "movement": 53,
-    "vo2_max": 43
+    "hr_avg": 65.2,
+    "hr_min": 56,
+    "hr_max": 122,
+    "hr_readings": 29,
+    "hrv": 73,
+    "steps": 13,
+    "spo2": 98,
+    "movement": 52,
+    "vo2_max": 43,
+    "active_min": 5
   },
   "2026-06-01": {
-    "vo2_max": 43
+    "hr_avg": 66.4,
+    "hr_min": 50,
+    "hr_max": 140,
+    "hr_readings": 86,
+    "sleep_rhr": 50,
+    "hrv": 88,
+    "sleep_hrv": 80,
+    "sleep_score": 80,
+    "sleep_hrs": 7.33,
+    "deep_sleep_min": 40,
+    "rem_sleep_min": 80,
+    "light_sleep_min": 320,
+    "sleep_efficiency": 88,
+    "time_in_bed_min": 500,
+    "recovery": 79,
+    "steps": 834,
+    "spo2": 97,
+    "movement": 71,
+    "vo2_max": 42,
+    "active_min": 20
   }
 }
