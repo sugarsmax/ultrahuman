@@ -2801,11 +2801,16 @@
     "hrv": 87,
     "steps": 4862,
     "spo2": 98,
-    "movement": 66,
+    "movement": 63,
     "vo2_max": 43,
     "active_min": 5
   },
   "2026-05-31": {
+    "steps": 0,
+    "movement": 53,
+    "vo2_max": 43
+  },
+  "2026-06-01": {
     "vo2_max": 43
   }
 }
