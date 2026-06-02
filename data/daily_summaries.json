@@ -2832,15 +2832,17 @@
     "light_sleep_min": 320,
     "sleep_efficiency": 88,
     "time_in_bed_min": 500,
-    "recovery": 79,
+    "recovery": 82,
     "steps": 2672,
     "spo2": 98,
-    "movement": 60,
+    "movement": 59,
     "vo2_max": 42,
     "active_min": 30
   },
   "2026-06-02": {
     "sleep_rhr": 50,
+    "steps": 0,
+    "movement": 57,
     "vo2_max": 42
   }
 }
