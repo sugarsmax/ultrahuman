@@ -2841,7 +2841,15 @@
     "active_min": 10
   },
   "2026-06-03": {
-    "sleep_rhr": 50,
-    "vo2_max": 42
+    "hr_avg": 83.0,
+    "hr_min": 64,
+    "hr_max": 109,
+    "hr_readings": 20,
+    "hrv": 96,
+    "steps": 1755,
+    "spo2": 98,
+    "movement": 70,
+    "vo2_max": 42,
+    "active_min": 10
   }
 }
