@@ -2853,6 +2853,15 @@
     "active_min": 20
   },
   "2026-06-04": {
-    "vo2_max": 42
+    "hr_avg": 81.3,
+    "hr_min": 62,
+    "hr_max": 121,
+    "hr_readings": 10,
+    "hrv": 104,
+    "steps": 1009,
+    "spo2": 98,
+    "movement": 67,
+    "vo2_max": 42,
+    "active_min": 5
   }
 }
