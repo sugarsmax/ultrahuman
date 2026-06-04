@@ -2841,15 +2841,18 @@
     "active_min": 10
   },
   "2026-06-03": {
-    "hr_avg": 83.0,
-    "hr_min": 64,
-    "hr_max": 109,
-    "hr_readings": 20,
-    "hrv": 96,
-    "steps": 1755,
-    "spo2": 98,
-    "movement": 70,
+    "hr_avg": 79.0,
+    "hr_min": 60,
+    "hr_max": 121,
+    "hr_readings": 57,
+    "hrv": 95,
+    "steps": 6495,
+    "spo2": 97,
+    "movement": 79,
     "vo2_max": 42,
-    "active_min": 10
+    "active_min": 20
+  },
+  "2026-06-04": {
+    "vo2_max": 42
   }
 }
