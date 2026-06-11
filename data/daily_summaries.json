@@ -2908,12 +2908,12 @@
     "active_min": 0
   },
   "2026-06-10": {
-    "hr_avg": 60.3,
-    "hr_min": 52,
-    "hr_max": 103,
-    "hr_readings": 79,
+    "hr_avg": 67.7,
+    "hr_min": 48,
+    "hr_max": 159,
+    "hr_readings": 135,
     "sleep_rhr": 53,
-    "hrv": 71,
+    "hrv": 91,
     "sleep_hrv": 69,
     "sleep_score": 79,
     "sleep_hrs": 6.08,
@@ -2922,15 +2922,23 @@
     "light_sleep_min": 185,
     "sleep_efficiency": 97,
     "time_in_bed_min": 375,
-    "recovery": 75,
-    "steps": 1300,
-    "spo2": 98,
-    "movement": 87,
+    "recovery": 80,
+    "steps": 4713,
+    "spo2": 97,
+    "movement": 74,
     "vo2_max": 45,
-    "active_min": 0
+    "active_min": 20
   },
   "2026-06-11": {
-    "sleep_rhr": 53,
-    "vo2_max": 45
+    "hr_avg": 85.6,
+    "hr_min": 65,
+    "hr_max": 94,
+    "hr_readings": 5,
+    "hrv": 116,
+    "steps": 1294,
+    "spo2": 98,
+    "movement": 70,
+    "vo2_max": 45,
+    "active_min": 0
   }
 }
