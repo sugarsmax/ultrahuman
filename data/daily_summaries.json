@@ -2799,16 +2799,10 @@
     "active_min": 0
   },
   "2026-05-31": {
-    "hr_avg": 65.2,
-    "hr_min": 56,
-    "hr_max": 122,
-    "hr_readings": 29,
-    "hrv": 73,
-    "steps": 13,
-    "spo2": 98,
+    "steps": 0,
     "movement": 52,
     "vo2_max": 43,
-    "active_min": 5
+    "active_min": 0
   },
   "2026-06-01": {
     "hr_avg": 70.7,
@@ -3120,9 +3114,18 @@
     "active_min": 0
   },
   "2026-06-20": {
-    "sleep_rhr": 51,
-    "steps": 0,
-    "movement": 58,
+    "hr_avg": 77.8,
+    "hr_min": 64,
+    "hr_max": 112,
+    "hr_readings": 6,
+    "hrv": 85,
+    "steps": 1318,
+    "spo2": 98,
+    "movement": 61,
+    "vo2_max": 42,
+    "active_min": 5
+  },
+  "2026-06-21": {
     "vo2_max": 42
   }
 }
