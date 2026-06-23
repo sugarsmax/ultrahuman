@@ -3123,7 +3123,7 @@
     "spo2": 98,
     "movement": 61,
     "vo2_max": 42,
-    "active_min": 5
+    "active_min": 0
   },
   "2026-06-21": {
     "vo2_max": 42
