@@ -3209,8 +3209,12 @@
     "recovery": 52,
     "steps": 1672,
     "spo2": 98,
-    "movement": 70,
+    "movement": 69,
     "vo2_max": 45,
     "active_min": 0
+  },
+  "2026-06-30": {
+    "sleep_rhr": 53,
+    "vo2_max": 45
   }
 }
