@@ -3262,9 +3262,9 @@
     "sleep_efficiency": 93,
     "time_in_bed_min": 445,
     "recovery": 80,
-    "steps": 9,
+    "steps": 125,
     "spo2": 98,
-    "movement": 61,
+    "movement": 55,
     "vo2_max": 45,
     "active_min": 0
   }
