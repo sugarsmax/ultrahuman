@@ -3261,7 +3261,7 @@
     "light_sleep_min": 290,
     "sleep_efficiency": 93,
     "time_in_bed_min": 445,
-    "recovery": 80,
+    "recovery": 85,
     "steps": 125,
     "spo2": 98,
     "movement": 54,
@@ -3270,6 +3270,8 @@
   },
   "2026-07-07": {
     "sleep_rhr": 50,
+    "steps": 0,
+    "movement": 54,
     "vo2_max": 45
   }
 }
