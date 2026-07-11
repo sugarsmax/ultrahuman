@@ -3014,7 +3014,12 @@
     "active_min": 0
   },
   "2026-06-15": {
+    "hr_avg": 55.4,
+    "hr_min": 48,
+    "hr_max": 69,
+    "hr_readings": 97,
     "sleep_rhr": 48,
+    "hrv": 56,
     "sleep_hrv": 57,
     "sleep_score": 82,
     "sleep_hrs": 7.25,
@@ -3027,7 +3032,8 @@
     "steps": 54,
     "spo2": 97,
     "movement": 58,
-    "vo2_max": 42
+    "vo2_max": 42,
+    "active_min": 0
   },
   "2026-06-16": {
     "hr_avg": 64.3,
