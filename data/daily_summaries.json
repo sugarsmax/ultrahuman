@@ -3320,9 +3320,19 @@
     "active_min": 5
   },
   "2026-07-12": {
+    "hr_avg": 75.5,
+    "hr_min": 55,
+    "hr_max": 140,
+    "hr_readings": 89,
     "sleep_rhr": 51,
-    "steps": 0,
-    "movement": 53,
+    "hrv": 81,
+    "steps": 13350,
+    "spo2": 98,
+    "movement": 100,
+    "vo2_max": 45,
+    "active_min": 20
+  },
+  "2026-07-13": {
     "vo2_max": 45
   }
 }
