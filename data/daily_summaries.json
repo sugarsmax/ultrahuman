@@ -3180,7 +3180,7 @@
     "hr_readings": 5,
     "sleep_rhr": 50,
     "hrv": 55,
-    "steps": 3044,
+    "steps": 1671,
     "spo2": 98,
     "movement": 61,
     "vo2_max": 44
@@ -3338,18 +3338,31 @@
     "vo2_max": 45
   },
   "2026-07-14": {
+    "steps": 0,
     "vo2_max": 45
   },
   "2026-07-15": {
+    "steps": 0,
     "vo2_max": 45
   },
   "2026-07-16": {
+    "steps": 0,
+    "movement": 65,
     "vo2_max": 45
   },
   "2026-07-17": {
+    "steps": 0,
+    "movement": 57,
     "vo2_max": 45
   },
   "2026-07-18": {
+    "steps": 0,
+    "movement": 57,
+    "vo2_max": 45
+  },
+  "2026-07-19": {
+    "steps": 0,
+    "movement": 50,
     "vo2_max": 45
   }
 }
