@@ -3481,11 +3481,10 @@
     "hr_min": 69,
     "hr_max": 104,
     "hr_readings": 35,
-    "sleep_rhr": 55,
     "hrv": 85,
     "steps": 5613,
     "spo2": 0,
-    "movement": 76,
+    "movement": 74,
     "vo2_max": 44,
     "active_min": 60
   }
