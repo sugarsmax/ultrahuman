@@ -3506,12 +3506,21 @@
     "recovery": 77,
     "steps": 1198,
     "spo2": 1,
-    "movement": 37,
+    "movement": 35,
     "vo2_max": 44,
     "active_min": 0
   },
   "2026-08-11": {
+    "hr_avg": 86.0,
+    "hr_min": 75,
+    "hr_max": 111,
+    "hr_readings": 5,
     "sleep_rhr": 57,
-    "vo2_max": 44
+    "hrv": 82,
+    "steps": 130,
+    "spo2": 0,
+    "movement": 53,
+    "vo2_max": 44,
+    "active_min": 5
   }
 }
