@@ -3511,16 +3511,15 @@
     "active_min": 0
   },
   "2026-08-11": {
-    "hr_avg": 86.0,
-    "hr_min": 75,
-    "hr_max": 111,
-    "hr_readings": 5,
-    "sleep_rhr": 57,
-    "hrv": 82,
-    "steps": 130,
+    "hr_avg": 75.4,
+    "hr_min": 66,
+    "hr_max": 114,
+    "hr_readings": 42,
+    "hrv": 74,
+    "steps": 1542,
     "spo2": 0,
-    "movement": 53,
+    "movement": 55,
     "vo2_max": 44,
-    "active_min": 5
+    "active_min": 10
   }
 }
