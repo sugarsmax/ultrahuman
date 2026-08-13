@@ -3543,5 +3543,9 @@
     "movement": 57,
     "vo2_max": 43,
     "active_min": 0
+  },
+  "2026-08-13": {
+    "sleep_rhr": 54,
+    "vo2_max": 43
   }
 }
