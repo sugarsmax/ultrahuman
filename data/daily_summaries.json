@@ -3602,14 +3602,14 @@
     "active_min": 0
   },
   "2026-08-16": {
-    "hr_avg": 82.0,
-    "hr_min": 82,
-    "hr_max": 82,
-    "hr_readings": 1,
-    "hrv": 121,
-    "steps": 65,
+    "hr_avg": 75.7,
+    "hr_min": 66,
+    "hr_max": 96,
+    "hr_readings": 39,
+    "hrv": 99,
+    "steps": 6541,
     "spo2": 0,
-    "movement": 54,
+    "movement": 76,
     "vo2_max": 42,
     "active_min": 0
   }
