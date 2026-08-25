@@ -3759,10 +3759,10 @@
     "light_sleep_min": 264,
     "sleep_efficiency": 92,
     "time_in_bed_min": 425,
-    "recovery": 80,
+    "recovery": 85,
     "steps": 29,
     "spo2": 1,
-    "movement": 64,
+    "movement": 57,
     "vo2_max": 41,
     "active_min": 0
   }
