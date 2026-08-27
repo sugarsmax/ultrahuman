@@ -3803,11 +3803,17 @@
     "light_sleep_min": 210,
     "sleep_efficiency": 98,
     "time_in_bed_min": 383,
-    "recovery": 77,
+    "recovery": 82,
     "steps": 47,
     "spo2": 0,
-    "movement": 58,
+    "movement": 57,
     "vo2_max": 40,
     "active_min": 0
+  },
+  "2026-08-27": {
+    "sleep_rhr": 54,
+    "steps": 0,
+    "movement": 54,
+    "vo2_max": 40
   }
 }
