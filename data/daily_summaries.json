@@ -3852,7 +3852,7 @@
     "hr_readings": 67,
     "sleep_rhr": 57,
     "hrv": 64,
-    "sleep_hrv": 65,
+    "sleep_hrv": 64,
     "sleep_score": 77,
     "sleep_hrs": 5.75,
     "deep_sleep_min": 90,
@@ -3863,12 +3863,20 @@
     "recovery": 71,
     "steps": 376,
     "spo2": 1,
-    "movement": 51,
+    "movement": 50,
     "vo2_max": 40,
     "active_min": 0
   },
   "2026-08-30": {
-    "sleep_rhr": 57,
-    "vo2_max": 40
+    "hr_avg": 75.3,
+    "hr_min": 64,
+    "hr_max": 97,
+    "hr_readings": 21,
+    "hrv": 63,
+    "steps": 1095,
+    "spo2": 0,
+    "movement": 54,
+    "vo2_max": 40,
+    "active_min": 0
   }
 }
