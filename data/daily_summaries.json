@@ -3478,7 +3478,7 @@
     "hr_avg": 69.2,
     "hr_min": 57,
     "hr_max": 96,
-    "hr_readings": 157,
+    "hr_readings": 155,
     "sleep_rhr": 57,
     "hrv": 64,
     "sleep_hrv": 54,
@@ -3875,8 +3875,11 @@
     "hrv": 75,
     "steps": 2244,
     "spo2": 0,
-    "movement": 56,
+    "movement": 58,
     "vo2_max": 40,
     "active_min": 0
+  },
+  "2026-08-31": {
+    "vo2_max": 40
   }
 }
