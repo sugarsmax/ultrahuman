@@ -3926,11 +3926,31 @@
   "2026-09-02": {
     "sleep_rhr": 55,
     "steps": 0,
-    "movement": 55,
-    "vo2_max": 40
+    "spo2": 0,
+    "movement": 54,
+    "vo2_max": 40,
+    "active_min": 0
   },
   "2026-09-03": {
-    "sleep_rhr": 55,
-    "vo2_max": 40
+    "hr_avg": 64.1,
+    "hr_min": 52,
+    "hr_max": 97,
+    "hr_readings": 91,
+    "sleep_rhr": 53,
+    "hrv": 65,
+    "sleep_hrv": 67,
+    "sleep_score": 76,
+    "sleep_hrs": 5.5,
+    "deep_sleep_min": 66,
+    "rem_sleep_min": 90,
+    "light_sleep_min": 174,
+    "sleep_efficiency": 98,
+    "time_in_bed_min": 340,
+    "recovery": 82,
+    "steps": 922,
+    "spo2": 1,
+    "movement": 61,
+    "vo2_max": 39,
+    "active_min": 0
   }
 }
