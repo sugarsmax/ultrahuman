@@ -4029,16 +4029,25 @@
     "vo2_max": 36
   },
   "2026-09-08": {
-    "hr_avg": 65.4,
+    "hr_avg": 65.8,
     "hr_min": 53,
     "hr_max": 102,
-    "hr_readings": 117,
-    "hrv": 88,
-    "steps": 556,
+    "hr_readings": 151,
+    "hrv": 90,
+    "steps": 679,
     "spo2": 70,
     "vo2_max": 36
   },
   "2026-09-09": {
+    "hr_avg": 69.0,
+    "hr_min": 52,
+    "hr_max": 112,
+    "hr_readings": 166,
+    "hrv": 91,
+    "steps": 3239,
+    "vo2_max": 36
+  },
+  "2026-09-10": {
     "vo2_max": 36
   }
 }
