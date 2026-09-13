@@ -4127,13 +4127,13 @@
     "vo2_max": 36
   },
   "2026-09-13": {
-    "hr_avg": 60.8,
+    "hr_avg": 66.4,
     "hr_min": 55,
-    "hr_max": 81,
-    "hr_readings": 68,
-    "sleep_rhr": 54,
-    "hrv": 65,
-    "steps": 48,
+    "hr_max": 91,
+    "hr_readings": 124,
+    "hrv": 86,
+    "steps": 6547,
+    "spo2": 95,
     "vo2_max": 36
   }
 }
