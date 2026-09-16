@@ -4193,15 +4193,21 @@
     "active_min": 0
   },
   "2026-09-15": {
-    "hr_avg": 70.7,
+    "hr_avg": 69.8,
     "hr_min": 54,
     "hr_max": 98,
-    "hr_readings": 167,
-    "hrv": 110,
-    "steps": 2893,
+    "hr_readings": 191,
+    "hrv": 103,
+    "steps": 2923,
     "vo2_max": 36
   },
   "2026-09-16": {
+    "hr_avg": 61.5,
+    "hr_min": 54,
+    "hr_max": 79,
+    "hr_readings": 61,
+    "hrv": 64,
+    "steps": 91,
     "vo2_max": 36
   }
 }
