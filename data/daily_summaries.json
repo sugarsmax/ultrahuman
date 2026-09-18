@@ -4211,12 +4211,15 @@
     "vo2_max": 36
   },
   "2026-09-17": {
-    "hr_avg": 60.8,
+    "hr_avg": 69.6,
     "hr_min": 55,
-    "hr_max": 84,
-    "hr_readings": 66,
-    "hrv": 66,
-    "steps": 137,
+    "hr_max": 101,
+    "hr_readings": 149,
+    "hrv": 100,
+    "steps": 2440,
+    "vo2_max": 36
+  },
+  "2026-09-18": {
     "vo2_max": 36
   }
 }
