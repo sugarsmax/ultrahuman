@@ -3868,16 +3868,16 @@
     "active_min": 0
   },
   "2026-08-30": {
-    "hr_avg": 74.4,
-    "hr_min": 61,
+    "hr_avg": 78.9,
+    "hr_min": 64,
     "hr_max": 116,
-    "hr_readings": 65,
-    "hrv": 67,
-    "steps": 4899,
+    "hr_readings": 40,
+    "hrv": 77,
+    "steps": 3478,
     "spo2": 0,
     "movement": 65,
     "vo2_max": 40,
-    "active_min": 5
+    "active_min": 0
   },
   "2026-08-31": {
     "hr_avg": 63.3,
@@ -4285,8 +4285,11 @@
     "hrv": 131,
     "steps": 9630,
     "spo2": 92,
-    "movement": 91,
+    "movement": 81,
     "vo2_max": 36,
     "active_min": 5
+  },
+  "2026-09-20": {
+    "vo2_max": 36
   }
 }
