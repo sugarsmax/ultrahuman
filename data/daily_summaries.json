@@ -4278,21 +4278,35 @@
     "active_min": 0
   },
   "2026-09-19": {
-    "hr_avg": 74.2,
-    "hr_min": 62,
+    "hr_avg": 72.4,
+    "hr_min": 59,
     "hr_max": 109,
-    "hr_readings": 57,
-    "hrv": 131,
-    "steps": 9630,
+    "hr_readings": 111,
+    "hrv": 115,
+    "steps": 12190,
     "spo2": 92,
     "movement": 81,
     "vo2_max": 36,
     "active_min": 5
   },
   "2026-09-20": {
+    "hr_avg": 67.9,
+    "hr_min": 54,
+    "hr_max": 92,
+    "hr_readings": 102,
+    "hrv": 99,
+    "steps": 5443,
+    "spo2": 93,
     "vo2_max": 36
   },
   "2026-09-21": {
+    "hr_avg": 60.6,
+    "hr_min": 54,
+    "hr_max": 86,
+    "hr_readings": 59,
+    "hrv": 74,
+    "steps": 20,
+    "spo2": 95,
     "vo2_max": 36
   }
 }
