@@ -622,6 +622,16 @@ const hrvChart = makeChart('hrvChart', 'HRV', '#4ecdc4', 'rgba(78,205,196,0.15)'
 const recoveryChart = makeChart('recoveryChart', 'Recovery', '#87bc40', 'rgba(135,188,64,0.15)');
 const spo2Chart = makeChart('spo2Chart', 'SpO2', '#f09d4f', 'rgba(240,157,79,0.15)');
 
+function fmtHour(h) {{
+  if (h === null || h === undefined) return '--';
+  const totalH = h % 24;
+  const hr = Math.floor(totalH < 0 ? totalH + 24 : totalH);
+  const m = Math.round((h % 1) * 60);
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  const h12 = hr % 12 || 12;
+  return h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+}}
+
 function tsToHour(ts) {{
   if (ts === null || ts === undefined) return null;
   const d = new Date(ts * 1000);
@@ -691,6 +701,12 @@ function updateView() {{
   const aRec = avg(recovery);
   if (aRec !== null) cards += makeStatCard('Recovery', aRec.toFixed(0), '');
   cards += makeStatCard('Days Tracked', String(days.length), '');
+  const last14Bed  = bedHours.filter(v => v !== null).slice(-14);
+  const last14Wake = wakeHours.filter(v => v !== null).slice(-14);
+  const avgBed  = last14Bed.length  ? last14Bed.reduce((a, b) => a + b, 0)  / last14Bed.length  : null;
+  const avgWake = last14Wake.length ? last14Wake.reduce((a, b) => a + b, 0) / last14Wake.length : null;
+  if (avgBed  !== null) cards += makeStatCard('Avg Bedtime (14d)',  fmtHour(avgBed),  '');
+  if (avgWake !== null) cards += makeStatCard('Avg Wake Time (14d)', fmtHour(avgWake), '');
   grid.innerHTML = cards;
 
   // --- Sleep Score chart ---
