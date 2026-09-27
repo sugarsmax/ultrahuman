@@ -499,6 +499,11 @@ def build_monthly_html(summaries_json: str, updated: str) -> str:
   </div>
 
   <div class="chart-box">
+    <h2>Sleep Timing</h2>
+    <canvas id="sleepTimingChart" height="160"></canvas>
+  </div>
+
+  <div class="chart-box">
     <h2>Sleep Duration &amp; Time in Bed</h2>
     <canvas id="sleepChart" height="180"></canvas>
   </div>
@@ -604,6 +609,7 @@ function makeBarChart(canvasId) {{
 
 // Sleep charts
 const sleepScoreChart = makeChart('sleepScoreChart', 'Sleep Score', '#58a6ff', 'rgba(88,166,255,0.15)');
+const sleepTimingChart = makeChart('sleepTimingChart', 'Bedtime', '#1A6BFF');
 const sleepChart = makeChart('sleepChart', 'Sleep', '#9b59b6', 'rgba(155,89,182,0.15)');
 const sleepStagesChart = makeBarChart('sleepStagesChart');
 const efficiencyChart = makeChart('efficiencyChart', 'Efficiency', '#4ecdc4', 'rgba(78,205,196,0.15)');
@@ -615,6 +621,14 @@ const hrvChart = makeChart('hrvChart', 'HRV', '#4ecdc4', 'rgba(78,205,196,0.15)'
 // Recovery & activity
 const recoveryChart = makeChart('recoveryChart', 'Recovery', '#87bc40', 'rgba(135,188,64,0.15)');
 const spo2Chart = makeChart('spo2Chart', 'SpO2', '#f09d4f', 'rgba(240,157,79,0.15)');
+
+function tsToHour(ts) {{
+  if (ts === null || ts === undefined) return null;
+  const d = new Date(ts * 1000);
+  const h = d.getHours() + d.getMinutes() / 60;
+  // Morning wake times (< 14h) are pushed past midnight; shift by +24 so axis is continuous
+  return h < 14 ? h + 24 : h;
+}}
 
 function makeStatCard(label, value, unit) {{
   return '<div class="stat-card">'
@@ -657,6 +671,10 @@ function updateView() {{
   const tibMin = get('time_in_bed_min');
   const spo2 = get('spo2');
 
+  // Bedtime start/end (Unix timestamps -> decimal hours, midnight-crossover-safe)
+  const bedHours  = get('bedtime_start').map(tsToHour);
+  const wakeHours = get('bedtime_end').map(tsToHour);
+
   // --- Stats cards ---
   const grid = document.getElementById('statsGrid');
   let cards = '';
@@ -681,6 +699,40 @@ function updateView() {{
   sleepScoreChart.options.scales.y.min = 0;
   sleepScoreChart.options.scales.y.max = 100;
   sleepScoreChart.update();
+
+  // --- Sleep Timing chart ---
+  sleepTimingChart.data.labels = labels;
+  sleepTimingChart.data.datasets = [
+    {{
+      label: 'Bedtime',
+      data: bedHours,
+      borderColor: '#1A6BFF',
+      backgroundColor: 'rgba(26,107,255,0.12)',
+      fill: false, tension: 0.3,
+      pointRadius: 3, pointBackgroundColor: '#1A6BFF', borderWidth: 2,
+    }},
+    {{
+      label: 'Wake Time',
+      data: wakeHours,
+      borderColor: '#DBAE06',
+      backgroundColor: 'rgba(219,174,6,0.12)',
+      fill: false, tension: 0.3,
+      pointRadius: 3, pointBackgroundColor: '#DBAE06', borderWidth: 2,
+    }}
+  ];
+  sleepTimingChart.options.scales.y.ticks = {{
+    color: '#8b949e',
+    callback: function(val) {{
+      const totalH = val % 24;
+      const h = Math.floor(totalH < 0 ? totalH + 24 : totalH);
+      const m = Math.round((val % 1) * 60);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      return h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+    }}
+  }};
+  sleepTimingChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
+  sleepTimingChart.update();
 
   // --- Sleep Duration chart ---
   const tibHrs = tibMin.map(v => v !== null ? +(v / 60).toFixed(2) : null);
