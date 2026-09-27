@@ -56,6 +56,8 @@ def extract_day_summary(day_metrics: list) -> dict:
     time_in_bed_min = None
     sleep_hours = None
     avg_sleep_hrv = None
+    bedtime_start = None
+    bedtime_end = None
 
     # Activity / body
     steps = None
@@ -116,6 +118,8 @@ def extract_day_summary(day_metrics: list) -> dict:
             end = obj.get("bedtime_end")
             if start and end:
                 sleep_hours = round((end - start) / 3600, 2)
+                bedtime_start = start
+                bedtime_end = end
 
         elif mtype == "steps":
             val = obj.get("total")
@@ -174,6 +178,10 @@ def extract_day_summary(day_metrics: list) -> dict:
         summary["sleep_efficiency"] = sleep_efficiency
     if time_in_bed_min is not None:
         summary["time_in_bed_min"] = time_in_bed_min
+    if bedtime_start is not None:
+        summary["bedtime_start"] = bedtime_start
+    if bedtime_end is not None:
+        summary["bedtime_end"] = bedtime_end
 
     # Recovery & activity
     if recovery is not None:
