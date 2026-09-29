@@ -499,8 +499,13 @@ def build_monthly_html(summaries_json: str, updated: str) -> str:
   </div>
 
   <div class="chart-box">
-    <h2>Sleep Timing</h2>
-    <canvas id="sleepTimingChart" height="160"></canvas>
+    <h2>Wake Time</h2>
+    <canvas id="sleepWakeChart" height="160"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Bedtime</h2>
+    <canvas id="sleepBedtimeChart" height="160"></canvas>
   </div>
 
   <div class="chart-box">
@@ -609,7 +614,8 @@ function makeBarChart(canvasId) {{
 
 // Sleep charts
 const sleepScoreChart = makeChart('sleepScoreChart', 'Sleep Score', '#58a6ff', 'rgba(88,166,255,0.15)');
-const sleepTimingChart = makeChart('sleepTimingChart', 'Bedtime', '#1A6BFF');
+const sleepBedtimeChart = makeChart('sleepBedtimeChart', 'Bedtime', '#1A6BFF');
+const sleepWakeChart = makeChart('sleepWakeChart', 'Wake Time', '#DBAE06');
 const sleepChart = makeChart('sleepChart', 'Sleep', '#9b59b6', 'rgba(155,89,182,0.15)');
 const sleepStagesChart = makeBarChart('sleepStagesChart');
 const efficiencyChart = makeChart('efficiencyChart', 'Efficiency', '#4ecdc4', 'rgba(78,205,196,0.15)');
@@ -716,39 +722,33 @@ function updateView() {{
   sleepScoreChart.options.scales.y.max = 100;
   sleepScoreChart.update();
 
-  // --- Sleep Timing chart ---
-  sleepTimingChart.data.labels = labels;
-  sleepTimingChart.data.datasets = [
-    {{
-      label: 'Bedtime',
-      data: bedHours,
-      borderColor: '#1A6BFF',
-      backgroundColor: 'rgba(26,107,255,0.12)',
-      fill: false, tension: 0.3,
-      pointRadius: 3, pointBackgroundColor: '#1A6BFF', borderWidth: 2,
-    }},
-    {{
-      label: 'Wake Time',
-      data: wakeHours,
-      borderColor: '#DBAE06',
-      backgroundColor: 'rgba(219,174,6,0.12)',
-      fill: false, tension: 0.3,
-      pointRadius: 3, pointBackgroundColor: '#DBAE06', borderWidth: 2,
-    }}
-  ];
-  sleepTimingChart.options.scales.y.ticks = {{
-    color: '#8b949e',
-    callback: function(val) {{
-      const totalH = val % 24;
-      const h = Math.floor(totalH < 0 ? totalH + 24 : totalH);
-      const m = Math.round((val % 1) * 60);
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      const h12 = h % 12 || 12;
-      return h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm;
-    }}
+  // --- Bedtime chart ---
+  // Bedtime commonly crosses midnight, so bedHours stays on the shifted
+  // (midnight-crossover-safe) scale for a continuous line; fmtHour() unwraps
+  // the shift back to a true clock value for both axis ticks and tooltips.
+  sleepBedtimeChart.data.labels = labels;
+  sleepBedtimeChart.data.datasets[0].data = bedHours;
+  // Fixed axis: 9:00 PM (21) to 1:00 AM (25 on the midnight-crossover-shifted scale)
+  sleepBedtimeChart.options.scales.y.min = 21;
+  sleepBedtimeChart.options.scales.y.max = 25;
+  sleepBedtimeChart.options.scales.y.ticks = {{ color: '#8b949e', stepSize: 1, callback: fmtHour }};
+  sleepBedtimeChart.options.plugins.tooltip.callbacks = {{
+    label: function(ctx) {{ return ctx.dataset.label + ': ' + fmtHour(ctx.parsed.y); }}
   }};
-  sleepTimingChart.options.plugins.legend = {{ display: true, labels: {{ color: '#8b949e', boxWidth: 12 }} }};
-  sleepTimingChart.update();
+  sleepBedtimeChart.update();
+
+  // --- Wake Time chart ---
+  // Wake times don't need the midnight-crossover shift, so plot the true
+  // clock hour directly -- axis ticks and tooltips both read correctly
+  // (e.g. 6:00 AM instead of 30:00).
+  const wakeHoursTrue = wakeHours.map(h => h === null ? null : h % 24);
+  sleepWakeChart.data.labels = labels;
+  sleepWakeChart.data.datasets[0].data = wakeHoursTrue;
+  sleepWakeChart.options.scales.y.ticks = {{ color: '#8b949e', callback: fmtHour }};
+  sleepWakeChart.options.plugins.tooltip.callbacks = {{
+    label: function(ctx) {{ return ctx.dataset.label + ': ' + fmtHour(ctx.parsed.y); }}
+  }};
+  sleepWakeChart.update();
 
   // --- Sleep Duration chart ---
   const tibHrs = tibMin.map(v => v !== null ? +(v / 60).toFixed(2) : null);
