@@ -4712,15 +4712,17 @@
     "active_min": 0
   },
   "2026-10-06": {
-    "hr_avg": 74.0,
-    "hr_min": 65,
-    "hr_max": 86,
-    "hr_readings": 28,
-    "sleep_rhr": 52,
-    "hrv": 105,
-    "steps": 279,
-    "movement": 57,
+    "hr_avg": 124.5,
+    "hr_min": 64,
+    "hr_max": 147,
+    "hr_readings": 1756,
+    "hrv": 152,
+    "steps": 3586,
+    "movement": 50,
     "vo2_max": 32,
-    "active_min": 0
+    "active_min": 28
+  },
+  "2026-10-07": {
+    "vo2_max": 32
   }
 }
