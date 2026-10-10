@@ -4363,6 +4363,10 @@
     "active_min": 0
   },
   "2026-09-19": {
+    "hr_avg": 72.4,
+    "hr_min": 59,
+    "hr_max": 109,
+    "hr_readings": 111,
     "hrv": 115,
     "steps": 12190,
     "spo2": 92,
