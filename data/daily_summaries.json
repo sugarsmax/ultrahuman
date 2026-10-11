@@ -4812,12 +4812,13 @@
     "recovery": 84,
     "steps": 5551,
     "spo2": 85,
-    "movement": 65,
+    "movement": 70,
     "vo2_max": 32,
     "active_min": 5
   },
   "2026-10-11": {
     "sleep_rhr": 53,
-    "vo2_max": 32
+    "vo2_max": 32,
+    "active_min": 0
   }
 }
