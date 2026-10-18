@@ -4528,12 +4528,12 @@
     "active_min": 0
   },
   "2026-09-27": {
-    "hr_avg": 67.4,
+    "hr_avg": 69.0,
     "hr_min": 54,
     "hr_max": 108,
-    "hr_readings": 147,
+    "hr_readings": 125,
     "sleep_rhr": 55,
-    "hrv": 101,
+    "hrv": 109,
     "sleep_hrv": 75,
     "sleep_score": 87,
     "sleep_hrs": 6.08,
@@ -4894,6 +4894,10 @@
     "vo2_max": 31
   },
   "2026-10-17": {
+    "sleep_rhr": 52,
+    "vo2_max": 31
+  },
+  "2026-10-18": {
     "sleep_rhr": 52,
     "vo2_max": 31
   }
