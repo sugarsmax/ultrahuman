@@ -4743,12 +4743,7 @@
     "active_min": 0
   },
   "2026-10-09": {
-    "hr_avg": 66.7,
-    "hr_min": 53,
-    "hr_max": 102,
-    "hr_readings": 226,
     "sleep_rhr": 54,
-    "hrv": 100,
     "sleep_hrv": 79,
     "sleep_score": 81,
     "sleep_hrs": 7.23,
@@ -4760,7 +4755,6 @@
     "bedtime_start": 1791528300,
     "bedtime_end": 1791557940,
     "recovery": 81,
-    "steps": 5457,
     "movement": 52,
     "vo2_max": 32,
     "active_min": 0
@@ -5010,6 +5004,9 @@
     "vo2_max": 32
   },
   "2026-10-29": {
+    "vo2_max": 32
+  },
+  "2026-10-30": {
     "vo2_max": 32
   }
 }
