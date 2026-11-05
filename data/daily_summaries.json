@@ -5140,12 +5140,32 @@
     "vo2_max": 31
   },
   "2026-11-03": {
+    "hr_avg": 70.6,
+    "hr_min": 52,
+    "hr_max": 122,
+    "hr_readings": 138,
+    "hrv": 60,
+    "steps": 2117,
     "vo2_max": 31
   },
   "2026-11-04": {
-    "vo2_max": 31
+    "hr_avg": 78.8,
+    "hr_min": 57,
+    "hr_max": 115,
+    "hr_readings": 78,
+    "hrv": 67,
+    "steps": 1730,
+    "movement": 36,
+    "vo2_max": 31,
+    "active_min": 10
   },
   "2026-11-05": {
+    "hr_avg": 66.0,
+    "hr_min": 56,
+    "hr_max": 91,
+    "hr_readings": 75,
+    "hrv": 44,
+    "steps": 370,
     "vo2_max": 31
   }
 }
