@@ -5224,11 +5224,13 @@
     "hr_min": 72,
     "hr_max": 101,
     "hr_readings": 40,
-    "sleep_rhr": 56,
     "hrv": 95,
     "steps": 1470,
     "movement": 64,
     "vo2_max": 31,
     "active_min": 0
+  },
+  "2026-11-07": {
+    "vo2_max": 31
   }
 }
