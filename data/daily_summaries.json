@@ -4990,10 +4990,6 @@
     "active_min": 0
   },
   "2026-10-23": {
-    "hr_avg": 66.1,
-    "hr_min": 53,
-    "hr_max": 85,
-    "hr_readings": 119,
     "sleep_rhr": 53,
     "hrv": 81,
     "sleep_hrv": 57,
