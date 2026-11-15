@@ -17,7 +17,9 @@ Usage:
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_DIR = SCRIPT_DIR.parent
@@ -25,6 +27,33 @@ DATA_DIR = PROJECT_DIR / "data"
 
 DEFAULT_INPUT = DATA_DIR / "last_7_days.json"
 SUMMARIES_FILE = DATA_DIR / "daily_summaries.json"
+
+LOCAL_TZ = ZoneInfo("America/Los_Angeles")
+
+# A real overnight sleep session almost always touches nighttime hours
+# (it starts in the evening/night and/or ends in the early morning). If a
+# "sleep" record's start AND end both fall entirely inside this daytime
+# window, it's almost certainly a nap or a sync glitch mis-logged as the
+# day's main sleep -- not a legitimate "woke up at 4pm" result. Verified
+# against the full history: every known-good night falls outside this
+# band (evening starts cluster at 18-23h, wake-ups cluster at 0-9h), while
+# every flagged anomaly (e.g. 8:37am-4:16pm) sits fully inside it.
+DAYTIME_NAP_START_HOUR = 6   # 6:00 AM
+DAYTIME_NAP_END_HOUR = 20    # 8:00 PM
+
+
+def _looks_like_daytime_nap(start_ts, end_ts) -> bool:
+    """True if a sleep record's start and end both fall within typical
+    daytime hours (local time) -- almost certainly a nap or a sync
+    glitch rather than the night's main sleep."""
+    if not start_ts or not end_ts:
+        return False
+    start_hour = datetime.fromtimestamp(start_ts, tz=LOCAL_TZ).hour
+    end_hour = datetime.fromtimestamp(end_ts, tz=LOCAL_TZ).hour
+    return (
+        DAYTIME_NAP_START_HOUR <= start_hour < DAYTIME_NAP_END_HOUR
+        and DAYTIME_NAP_START_HOUR <= end_hour < DAYTIME_NAP_END_HOUR
+    )
 
 
 def _safe_nested(obj: dict, *keys, fallback=None):
@@ -58,6 +87,10 @@ def extract_day_summary(day_metrics: list) -> dict:
     avg_sleep_hrv = None
     bedtime_start = None
     bedtime_end = None
+    nap_bedtime_start = None
+    nap_bedtime_end = None
+    nap_sleep_hours = None
+    sleep_anomaly = False
 
     # Activity / body
     steps = None
@@ -106,20 +139,32 @@ def extract_day_summary(day_metrics: list) -> dict:
                     recovery = val
 
         elif mtype == "sleep":
-            sleep_score = _safe_nested(obj, "sleep_score", "score")
-            sleep_total_min = _safe_nested(obj, "total_sleep", "minutes")
-            sleep_deep_min = _safe_nested(obj, "deep_sleep", "minutes")
-            sleep_rem_min = _safe_nested(obj, "rem_sleep", "minutes")
-            sleep_light_min = _safe_nested(obj, "light_sleep", "minutes")
-            sleep_efficiency = _safe_nested(obj, "sleep_efficiency", "percentage")
-            time_in_bed_min = _safe_nested(obj, "time_in_bed", "minutes")
-
             start = obj.get("bedtime_start")
             end = obj.get("bedtime_end")
-            if start and end:
-                sleep_hours = round((end - start) / 3600, 2)
-                bedtime_start = start
-                bedtime_end = end
+
+            if _looks_like_daytime_nap(start, end):
+                # Likely a daytime nap (or a sync glitch) mis-logged as
+                # the day's sleep record. Keep it out of the main sleep
+                # stats / bedtime fields so it doesn't skew the Wake
+                # Time chart or rolling averages; stash it separately
+                # instead.
+                sleep_anomaly = True
+                nap_bedtime_start = start
+                nap_bedtime_end = end
+                nap_sleep_hours = round((end - start) / 3600, 2)
+            else:
+                sleep_score = _safe_nested(obj, "sleep_score", "score")
+                sleep_total_min = _safe_nested(obj, "total_sleep", "minutes")
+                sleep_deep_min = _safe_nested(obj, "deep_sleep", "minutes")
+                sleep_rem_min = _safe_nested(obj, "rem_sleep", "minutes")
+                sleep_light_min = _safe_nested(obj, "light_sleep", "minutes")
+                sleep_efficiency = _safe_nested(obj, "sleep_efficiency", "percentage")
+                time_in_bed_min = _safe_nested(obj, "time_in_bed", "minutes")
+
+                if start and end:
+                    sleep_hours = round((end - start) / 3600, 2)
+                    bedtime_start = start
+                    bedtime_end = end
 
         elif mtype == "steps":
             val = obj.get("total")
@@ -182,6 +227,14 @@ def extract_day_summary(day_metrics: list) -> dict:
         summary["bedtime_start"] = bedtime_start
     if bedtime_end is not None:
         summary["bedtime_end"] = bedtime_end
+    if nap_bedtime_start is not None:
+        summary["nap_bedtime_start"] = nap_bedtime_start
+    if nap_bedtime_end is not None:
+        summary["nap_bedtime_end"] = nap_bedtime_end
+    if nap_sleep_hours is not None:
+        summary["nap_sleep_hrs"] = nap_sleep_hours
+    if sleep_anomaly:
+        summary["sleep_anomaly"] = True
 
     # Recovery & activity
     if recovery is not None:
