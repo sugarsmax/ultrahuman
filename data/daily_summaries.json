@@ -5263,15 +5263,15 @@
     "sleep_rhr": 53,
     "hrv": 37,
     "sleep_hrv": 36,
+    "nap_bedtime_start": 1794155820,
+    "nap_bedtime_end": 1794183360,
+    "nap_sleep_hrs": 7.65,
+    "sleep_anomaly": true,
     "recovery": 56,
     "steps": 5,
     "movement": 59,
     "vo2_max": 31,
-    "active_min": 0,
-    "nap_bedtime_start": 1794155820,
-    "nap_bedtime_end": 1794183360,
-    "nap_sleep_hrs": 7.65,
-    "sleep_anomaly": true
+    "active_min": 0
   },
   "2026-11-09": {
     "hr_avg": 68.1,
@@ -5281,15 +5281,15 @@
     "sleep_rhr": 55,
     "hrv": 41,
     "sleep_hrv": 37,
+    "nap_bedtime_start": 1794244080,
+    "nap_bedtime_end": 1794271260,
+    "nap_sleep_hrs": 7.55,
+    "sleep_anomaly": true,
     "recovery": 51,
     "steps": 4832,
     "movement": 74,
     "vo2_max": 31,
-    "active_min": 5,
-    "nap_bedtime_start": 1794244080,
-    "nap_bedtime_end": 1794271260,
-    "nap_sleep_hrs": 7.55,
-    "sleep_anomaly": true
+    "active_min": 5
   },
   "2026-11-10": {
     "sleep_rhr": 55,
@@ -5330,18 +5330,49 @@
     "active_min": 15
   },
   "2026-11-13": {
-    "hr_avg": 61.5,
-    "hr_min": 56,
-    "hr_max": 66,
-    "hr_readings": 73,
-    "hrv": 39,
-    "steps": 86,
-    "vo2_max": 31
+    "hr_avg": 64.8,
+    "hr_min": 52,
+    "hr_max": 98,
+    "hr_readings": 112,
+    "sleep_rhr": 56,
+    "hrv": 42,
+    "sleep_hrv": 39,
+    "sleep_score": 92,
+    "sleep_hrs": 7.68,
+    "deep_sleep_min": 72,
+    "rem_sleep_min": 126,
+    "light_sleep_min": 268,
+    "sleep_efficiency": 95,
+    "time_in_bed_min": 488,
+    "bedtime_start": 1794553800,
+    "bedtime_end": 1794583080,
+    "recovery": 80,
+    "steps": 1241,
+    "movement": 64,
+    "vo2_max": 31,
+    "active_min": 0
   },
   "2026-11-14": {
-    "vo2_max": 31
+    "hr_avg": 56.9,
+    "hr_min": 52,
+    "hr_max": 78,
+    "hr_readings": 147,
+    "sleep_rhr": 52,
+    "hrv": 38,
+    "sleep_hrv": 37,
+    "nap_bedtime_start": 1794682380,
+    "nap_bedtime_end": 1794710760,
+    "nap_sleep_hrs": 7.88,
+    "sleep_anomaly": true,
+    "recovery": 55,
+    "steps": 55,
+    "movement": 37,
+    "vo2_max": 31,
+    "active_min": 0
   },
   "2026-11-15": {
+    "sleep_rhr": 52,
+    "steps": 6,
     "vo2_max": 31
   }
 }
