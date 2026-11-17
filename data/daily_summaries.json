@@ -5383,12 +5383,12 @@
     "active_min": 0
   },
   "2026-11-16": {
-    "hr_avg": 61.9,
+    "hr_avg": 71.1,
     "hr_min": 53,
-    "hr_max": 106,
-    "hr_readings": 73,
-    "hrv": 40,
-    "steps": 691,
+    "hr_max": 107,
+    "hr_readings": 171,
+    "hrv": 67,
+    "steps": 2422,
     "vo2_max": 31
   }
 }
