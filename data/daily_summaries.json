@@ -5364,7 +5364,7 @@
     "nap_bedtime_end": 1794710760,
     "nap_sleep_hrs": 7.88,
     "sleep_anomaly": true,
-    "recovery": 55,
+    "recovery": 75,
     "steps": 55,
     "movement": 37,
     "vo2_max": 31,
@@ -5401,11 +5401,15 @@
     "bedtime_end": 1794839580,
     "recovery": 83,
     "steps": 2917,
-    "movement": 44,
+    "movement": 42,
     "vo2_max": 31,
     "active_min": 0
   },
   "2026-11-17": {
+    "sleep_rhr": 54,
+    "vo2_max": 31
+  },
+  "2026-11-18": {
     "sleep_rhr": 54,
     "vo2_max": 31
   }
