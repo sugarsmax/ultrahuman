@@ -5444,8 +5444,26 @@
     "hr_min": 52,
     "hr_max": 66,
     "hr_readings": 57,
+    "sleep_rhr": 54,
     "hrv": 30,
+    "sleep_hrv": 33,
+    "sleep_score": 90,
+    "sleep_hrs": 6.85,
+    "deep_sleep_min": 102,
+    "rem_sleep_min": 72,
+    "light_sleep_min": 242,
+    "sleep_efficiency": 93,
+    "time_in_bed_min": 441,
+    "bedtime_start": 1795069080,
+    "bedtime_end": 1795095540,
+    "recovery": 85,
     "steps": 11,
+    "movement": 56,
+    "vo2_max": 31,
+    "active_min": 0
+  },
+  "2026-11-20": {
+    "sleep_rhr": 54,
     "vo2_max": 31
   }
 }
