@@ -5474,8 +5474,13 @@
     "vo2_max": 31
   },
   "2026-11-21": {
+    "hr_avg": 96.5,
+    "hr_min": 83,
+    "hr_max": 106,
+    "hr_readings": 6,
     "sleep_rhr": 54,
-    "steps": 600,
+    "hrv": 94,
+    "steps": 3106,
     "vo2_max": 31
   }
 }
