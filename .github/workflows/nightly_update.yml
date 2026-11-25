@@ -84,14 +84,33 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deployment3.outputs.page_url || steps.deployment2.outputs.page_url || steps.deployment.outputs.page_url }}
     steps:
-      # Pages API intermittently returns 5xx; retry before failing the workflow (run #803).
+      # Pages API intermittently returns 5xx (run #803); retry with separate deploy steps.
       - name: Deploy to GitHub Pages
-        id: deploy
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 8
-          max_attempts: 5
-          retry_wait_seconds: 45
-          uses: actions/deploy-pages@v5
+        id: deployment
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+      - name: Wait before retry
+        if: steps.deployment.outcome != 'success'
+        run: sleep 45
+      - name: Deploy to GitHub Pages (2)
+        if: steps.deployment.outcome != 'success'
+        id: deployment2
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+      - name: Wait before retry
+        if: steps.deployment.outcome != 'success' && steps.deployment2.outcome != 'success'
+        run: sleep 45
+      - name: Deploy to GitHub Pages (3)
+        if: steps.deployment.outcome != 'success' && steps.deployment2.outcome != 'success'
+        id: deployment3
+        uses: actions/deploy-pages@v5
+      - name: Fail if deploy did not succeed
+        if: >-
+          steps.deployment.outcome != 'success'
+          && steps.deployment2.outcome != 'success'
+          && steps.deployment3.outcome != 'success'
+        run: |
+          echo "All deploy attempts failed."
+          exit 1
