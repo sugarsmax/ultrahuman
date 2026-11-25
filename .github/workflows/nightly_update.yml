@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   TZ: America/Los_Angeles
 
 concurrency:
@@ -72,18 +71,27 @@ jobs:
       # Deploy must run in a separate job so artifact metadata is visible (deploy-pages#451).
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
+      actions: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
+      # Pages API intermittently returns 5xx; retry before failing the workflow (run #803).
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@v5
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 8
+          max_attempts: 5
+          retry_wait_seconds: 45
+          uses: actions/deploy-pages@v5
